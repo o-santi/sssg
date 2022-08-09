@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- Aug  9, 2022-001660067135 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>cálculo discreto e programação funcional</title>
+<meta name="author" content="@o-santi" />
+<meta name="description" content="cálculo númerico é muito mais fácil usando programação funcional" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+</style>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">cálculo discreto e programação funcional</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org81851f5">1. derivadas e programação funcional</a></li>
+<li><a href="#org2fcbcbf">2. integral</a></li>
+</ul>
+</div>
+</div>
+<p>
+na aula de cálculo numérico que puxei esse período, tivemos que entregar uma biblioteca de funções gerais do tópico, incluindo derivadas e integrais discretas. como achei o tópico muito interessante (e com gráficos muito bonitos), decidi trazer algumas coisinhas que aprendemos para cá.
+</p>
+
+<p>
+qualquer um que minimamente prestou atenção nas aulas de cálculo 1 e 2 já viram as respectivas definições de integral e derivada contínuas, mas como exatamente transformamo-as em funções calculáveis pelo nosso computador? essa pergunta não só não é 100% clara, como muitas vezes toca em tópicos ainda sombrios na área de computação e matemática, como por exemplo representação de números reais no computador, ou representação de limites como o valor de uma soma infinita.
+</p>
+
+<p>
+uma solução para isso é discretizarmos os intervalos. ao invés de assumirmos que o eixo \(x\) das abscissas é o conjunto dos reais (ou seja, infinitos números), escolhemos um conjunto finito de números que será o intervalo pelo qual nós iremos integrar (ou derivar). mas o que isso de fato significa?
+</p>
+
+<div id="outline-container-org81851f5" class="outline-2">
+<h2 id="org81851f5"><span class="section-number-2">1.</span> derivadas e programação funcional</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+consideraremos todos os intervalos de agora em diante como conjuntos (listas, arrays) de pontos (valores inteiros ou floats). isso se dá pois muitas vezes em cálculo numérico (quase sempre) estamos procurando boas soluções aproximadas utilizando as informações que colhemos na vida real, e muitas vezes essas informações vem em forma de pontos \((x, y)\).
+</p>
+
+<p>
+assim, podemos começar a estipular como imaginamos que a nossa derivada é. se olharmos para a definição original de derivada, podemos ver algo super interessante
+\[
+f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}
+\]
+se nós imaginarmos que o nosso intervalo de derivação é discretizado, podemos estipular uma função \(g\) que é definida sobre o conjunto finito \(X = [x_1, x_2, \cdots, x_n]\) tal que
+\[
+\forall x_i \in X: ~ g(x_i) = \frac{f(x_{i+1}) - f(x_i)}{x_{i+1} - x_i}
+\]
+isto é, transformamos o intervalo \(h\) que teoricamente tende a zero na diferença entre dois elementos consecutivos, e assim eliminamos o problema do limite (já que não sabemos exatamente o que ele significa matematicamente <i>anyways</i>). de quebra, também eliminamos outro problema escondido: quando temos dados colhidos na vida real, nem sempre temos a certeza de que o intervalo foi uniformemente dividido (ou seja, o valor de <code>h</code> pode mudar para um mesmo conjunto).
+</p>
+
+<p>
+utilizando essa definição, temos uma função que para cada ponto \(x_i\), nos devolve o valor da derivada discreta de uma função \(f\) contínua, de modo que podemos aproximar (ou estimar) a derivada da função original sem ter que mexer com limites!
+</p>
+
+<p>
+colocamos então como objetivo nosso implementar uma função \(g(f, xs)\), que recebe uma função \(f\) e o intervalo de derivação \(xs\) (um conjunto de valor para os quais \(f\) está definida). entretanto, temos um pequeno empasse: como nós iremos iterar por \(xs\)? pois precisamos pegar todos os pares consecutivos dessa lista, e essas funções nem sempre são óbvias de se implementar.
+</p>
+
+<p>
+se observarmos bem de perto, vemos que a estrutura dessa iteração consecutiva é bem parecida com algumas funções <i>higher order</i> comuns em linguagens funcionais, em especial com a família de funções <code>fold</code>. em haskell, definimos <code>foldl</code> (<code>fold</code> com associatividade à esquerda) como:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"> foldl <span style="color: #715ab1;">::</span> <span style="color: #3a81c3;">(</span>b <span style="color: #715ab1;">-&gt;</span> a <span style="color: #715ab1;">-&gt;</span> b<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">-&gt;</span> b <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span>a<span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">-&gt;</span> b
+ foldl f z <span style="color: #3a81c3; font-weight: bold;">[]</span>     <span style="color: #715ab1;">=</span> z
+ foldl f z <span style="color: #3a81c3;">(</span>x<span style="color: #ba2f59; font-weight: bold;">:</span>xs<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> foldl f <span style="color: #3a81c3;">(</span>f z x<span style="color: #3a81c3;">)</span> xs
+</pre>
+</div>
+<p>
+isto é, é uma função que recebe outra função \(f\) e consecutivamente aplica ela numa lista, carregando consigo o resultado da aplicação anterior de \(f\) (chamado de <code>z</code>). entretanto, não queremos guardar a última aplicação de função, mas sim o último elemento que fora iterado da lista. assim, o que queremos implementar de fato é a seguinte função:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"> consec <span style="color: #715ab1;">::</span> <span style="color: #3a81c3;">(</span>x <span style="color: #715ab1;">-&gt;</span> x <span style="color: #715ab1;">-&gt;</span> y<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">-&gt;</span> x <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span>x<span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span>y<span style="color: #3a81c3;">]</span>
+ consec f ant <span style="color: #3a81c3; font-weight: bold;">[]</span>     <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+ consec f ant <span style="color: #3a81c3;">(</span>x<span style="color: #ba2f59; font-weight: bold;">:</span>xs<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3;">(</span>f ant x<span style="color: #3a81c3;">)</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #3a81c3;">(</span>consec f x xs<span style="color: #3a81c3;">)</span>
+
+ consecutivos f <span style="color: #3a81c3;">(</span>x<span style="color: #ba2f59; font-weight: bold;">:</span>xs<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> consec f x xs
+</pre>
+</div>
+<p>
+ok, talvez seja um pouco demais para absorver mas vamos com calma. implementamos o nosso iterador de elementos consecutivos <code>consec</code> de maneira bem parecida com o <code>fold</code>. a ideia é mantermos sempre o elemento anterior <code>ant</code> atualizado, de modo que quando calculamos o elemento atual, utilizamos <code>(f ant x)</code> e dizemos que <code>x</code> é o novo elemento anterior. por fim, concatenamos o resultado recursivamente, chamando <code>consec</code> na lista restante <code>xs</code>.
+</p>
+
+<p>
+podemos ver isso em ação:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #715ab1;">*</span><span style="color: #ba2f59; font-weight: bold;">Main</span><span style="color: #715ab1;">&gt;</span>  consecutivos <span style="color: #3a81c3;">(</span><span style="color: #715ab1;">+</span><span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">[</span>1, 2, 3, 4, 5<span style="color: #3a81c3;">]</span>
+<span style="color: #3a81c3;">[</span>3,5,7,9<span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+o array <code>[3, 5, 7, 9]</code> é exatamente o resultado de aplicar a função soma <code>(+)</code> na lista de elementos consecutivos <code>[(1, 2), (2, 3), (3, 4), (4, 5)]</code>, que se torna <code>[(1 + 2), (2 + 3), (3 + 4), (4 + 5)]</code>, que é exatamente o que queríamos.
+</p>
+
+<p>
+utilizando <code>consecutivos</code>, é muito fácil definir a derivada discreta em haskell:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">derivada</span> func xs <span style="color: #715ab1;">=</span>
+  <span style="color: #3a81c3; font-weight: bold;">let</span> g f <span style="color: #715ab1;">=</span> <span style="color: #715ab1;">\</span>a b <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">(</span><span style="color: #6c3163;">(</span>f b<span style="color: #6c3163;">)</span> <span style="color: #715ab1;">-</span> <span style="color: #6c3163;">(</span>f a<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">/</span> <span style="color: #3a81c3;">(</span>b <span style="color: #715ab1;">-</span> a<span style="color: #3a81c3;">)</span> <span style="color: #3a81c3; font-weight: bold;">in</span>
+    consecutivos <span style="color: #3a81c3;">(</span>g func<span style="color: #3a81c3;">)</span> xs
+</pre>
+</div>
+<p>
+entendeu?? essas três linhas acima são tudo que precisamos. a função <code>g</code> é a que emula nossa derivada (que fora citada anteriormente), recebendo uma função <code>f</code> e retornando a função que calcula aproximadamente o valor da derivada nesse ponto. depois, simplesmente retornamos <code>consecutivos</code>, aplicando função que fora fornecida para <code>derivada</code> em <code>g</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">import</span> <span style="color: #ba2f59; font-weight: bold;">Graphics.Matplotlib</span>
+
+<span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">fun&#231;&#227;o que recebe um inicio, um fim e um tamanho `len`,</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">e retorna uma lista de [inicio, fim (aproximado)]</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">com exatamente `len` elementos</span>
+<span style="color: #6c3163; font-weight: bold;">range</span> <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">Double</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #ba2f59; font-weight: bold;">Double</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #ba2f59; font-weight: bold;">Int</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span><span style="color: #ba2f59; font-weight: bold;">Double</span><span style="color: #3a81c3;">]</span>
+<span style="color: #6c3163; font-weight: bold;">range</span> start end len <span style="color: #715ab1;">=</span>
+  <span style="color: #3a81c3; font-weight: bold;">let</span> step <span style="color: #715ab1;">=</span> <span style="color: #3a81c3;">(</span>end <span style="color: #715ab1;">-</span> start<span style="color: #3a81c3;">)</span><span style="color: #715ab1;">/</span> <span style="color: #3a81c3;">(</span>fromIntegral len<span style="color: #3a81c3;">)</span> <span style="color: #3a81c3; font-weight: bold;">in</span>
+    take len <span style="color: #3a81c3;">[</span>start, start<span style="color: #715ab1;">+</span>step<span style="color: #715ab1;">..</span><span style="color: #3a81c3;">]</span>
+
+<span style="color: #6c3163; font-weight: bold;">plot_1</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">let</span>
+    start <span style="color: #715ab1;">=</span> <span style="color: #715ab1;">-</span>10
+    end <span style="color: #715ab1;">=</span> 10
+    n   <span style="color: #715ab1;">=</span> 200
+    intervalo <span style="color: #715ab1;">=</span> range start end
+    <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">retorna uma lista com k intervalos</span>
+    f x <span style="color: #715ab1;">=</span> sin x
+  <span style="color: #3a81c3; font-weight: bold;">in</span>
+    onscreen <span style="color: #715ab1;">$</span>
+    plotMapLinear f start end <span style="color: #3a81c3;">(</span>fromIntegral n<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"springgreen"</span>, o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"sin(x)"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> plotMapLinear cos start end <span style="color: #3a81c3;">(</span>fromIntegral n<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"firebrick"</span>, o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"derivada real = cos(x)"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> scatter <span style="color: #3a81c3;">(</span>intervalo <span style="color: #6c3163;">(</span>n<span style="color: #715ab1;">-</span>1<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">(</span>derivada f <span style="color: #6c3163;">(</span>intervalo n<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"derivada aproximada"</span>, o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"tomato"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> legend <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"loc"</span> <span style="color: #2d9574;">"upper right"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> tightLayout
+plot_1
+</pre>
+</div>
+
+<div id="org717c123" class="figure">
+<p><img src="calculo-discreto/img1.png" alt="img1.png" />
+</p>
+<p><span class="figure-number">Figure 1: </span>derivada discreta de \(sin(x)\)</p>
+</div>
+
+<p>
+sim, eu sou maluco de usar matplolib com haskell. mas é melhor do que ter que usar python ou julia pra definir funções recursivas sem sequer ter acesso à <i>tail call optimization</i> ou tipos algébricos. não tem problema se o código do <i>plot</i> parecer um pouco confuso, a única parte realmente importante é que estamos utilizando <code>scatter xs ys</code> para mostrar os pontos, onde <code>xs</code> é o nosso intervalo e <code>ys</code> é a lista de pontos retornada pela derivada. 
+</p>
+
+<p>
+o que é muito interessante é que a função <code>derivada</code> sequer sabe alguma coisa sobre a função seno. ela não sabe que \(\sin ^2 + \cos^2 = 1\), ou sobre definições de <i>power series</i> infinitas, ou qualquer outra relação que possa ser útil para derivada, e ainda sim ela é capaz de estimar (só utilizando o comportamento local da função) como a derivada se parece. de fato, podemos estimar a derivada de <i>qualquer</i> função <code>f</code>, contanto que ela esteja definida para todos os pontos de <code>xs</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org2fcbcbf" class="outline-2">
+<h2 id="org2fcbcbf"><span class="section-number-2">2.</span> integral</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+enquanto definir a derivada foi uma caminhada no parque, a integral é um pouco mais <i>envolved</i>. contudo, já temos meio caminho andado: é comum tocar no tópico de <a href="https://pt.wikipedia.org/wiki/Soma_de_Riemann">somas de rieman</a> quando estudamos cálculo, e é exatamente isso que queremos emular na integral discreta.
+</p>
+
+<p>
+em especial, aproximaremos a área embaixo da curva através da regra trapezoidal (ao invés de retângulos, estimamos a área de trapézios embaixo da curva). isso significa que, se \(f\) é uma função definida no conjunto \(X = [x_1, \cdots, x_n]\):
+\[
+\int_{x_1}^{x_n} f(x) \,dx \approx \sum_{i=1}^{n} (f(x_i) + f(x_{i+1}))(x_{i+1} - x_i) \frac{1}{2}
+\]
+ou seja, para calcular o valor da integral entre \(x_1\) e \(x_n\), somamos as áreas de todos os trapézios consecutivos. te lembra de algo? exatamente, <code>consecutivos</code> novamente.
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">integral_intervalo</span> func xs <span style="color: #715ab1;">=</span> 
+  <span style="color: #3a81c3; font-weight: bold;">let</span> trapezio f <span style="color: #715ab1;">=</span> <span style="color: #715ab1;">\</span>a b <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">(</span><span style="color: #6c3163;">(</span>f b<span style="color: #6c3163;">)</span> <span style="color: #715ab1;">+</span> <span style="color: #6c3163;">(</span>f a<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">*</span> <span style="color: #3a81c3;">(</span>b <span style="color: #715ab1;">-</span> a<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">*</span> 1<span style="color: #715ab1;">/</span>2 <span style="color: #3a81c3; font-weight: bold;">in</span>
+    sum <span style="color: #715ab1;">$</span> consecutivos <span style="color: #3a81c3;">(</span>trapezio func<span style="color: #3a81c3;">)</span> xs
+</pre>
+</div>
+<p>
+é uma implementação bem parecida com a derivada, só mudamos <code>g</code> para a função <code>trapezio</code> (que nos dá a área do trapézio entre <code>a</code> e <code>b</code>) e no final somamos todas essas áreas usando <code>sum</code>.
+</p>
+
+<p>
+usando a integral podemos, por exemplo, calcular o valor de <code>e</code>:
+\[
+\int_0^1 e^x \, dx = e^1 - e^0 = e - 1
+\]
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #715ab1;">*</span><span style="color: #ba2f59; font-weight: bold;">Main</span><span style="color: #715ab1;">&gt;</span> e <span style="color: #715ab1;">=</span> <span style="color: #3a81c3;">(</span>integral_intervalo exp <span style="color: #6c3163;">(</span>range 0 1 1000000<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">+</span> 1
+<span style="color: #715ab1;">*</span><span style="color: #ba2f59; font-weight: bold;">Main</span><span style="color: #715ab1;">&gt;</span> e <span style="color: #715ab1;">-</span> <span style="color: #3a81c3;">(</span>exp 1<span style="color: #3a81c3;">)</span>
+<span style="color: #715ab1;">-</span>2.7182803195024974e-6
+<span style="color: #715ab1;">*</span><span style="color: #ba2f59; font-weight: bold;">Main</span><span style="color: #715ab1;">&gt;</span> e
+2.7182791101787256
+</pre>
+</div>
+<p>
+ignorando o fato de que estamos usando <code>exp</code> para calcular e depois comparando o resultado com <code>exp</code> (o que pode dar errado??), vemos que conseguimos aproximar nosso próprio valor do número de euler bem facilmente.
+</p>
+
+<p>
+entretanto, o leitor ávido deve estar percebendo uma leve diferença agora. a função <code>derivada</code> recebe <code>f</code> e <code>xs</code> e retorna os pontos estimados na derivada, enquanto a função <code>integral_intervalo</code> recebe <code>f</code> e <code>xs</code> e retorna um único valor. como faríamos para estimar pontos que estariam na integral de \(f\)?
+</p>
+
+<p>
+de fato, precisamos utilizar um pouco de engenhosidade. se olhar bem, verá que nomeei a função <code>integral_intervalo</code>, e não foi à toa: essa função calcula o valor específico da integral em um intervalo específico, e podemos usá-la para calcular os pontos que estariam na função que representa a integral.
+</p>
+
+<p>
+brincando um pouco com a definição de integral, eventualmente você também chegará na seguinte relação:
+\[
+\sigma(\alpha) = \int_c^\alpha f(x) \, dx = F(\alpha) - F(c)
+\]
+onde \(F\) é a função que representa a integral de \(f\), e \(c\) é uma constante. entendeu agora? a função que definimos \(\sigma\) depende de um parâmetro apenas e retorna o valor da integral nesse ponto menos uma constante (a integral de \(c\)). se escolhermos \(c\) tal que \(F(c) = 0\), temos uma função que nos dá o valor exato da integral de \(f\) para cada ponto do domínio (claro, se estiver definido e tudo mais).
+</p>
+
+<p>
+implementá-la não é difícil:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">integral</span> f xs c <span style="color: #715ab1;">=</span> map h xs
+  <span style="color: #3a81c3; font-weight: bold;">where</span> h x
+          <span style="color: #715ab1;">|</span> c <span style="color: #715ab1;">&lt;=</span> x    <span style="color: #715ab1;">=</span>   integral_intervalo f <span style="color: #3a81c3;">(</span>range c x 0.01<span style="color: #3a81c3;">)</span>
+          <span style="color: #715ab1;">|</span> otherwise <span style="color: #715ab1;">=</span> <span style="color: #715ab1;">-</span> integral_intervalo f <span style="color: #3a81c3;">(</span>range x c 0.01<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+note que construimos uma função <code>h</code> da seguinte forma:
+</p>
+\begin{equation}
+h(\alpha) =
+\begin{cases}
+&\displaystyle\int_{c}^{\alpha} f(x) \, dx = F(\alpha) - F(c) &\text{ se } \alpha \geq c\\
+-&\displaystyle\int_{\alpha}^{c} f(x) \, dx = -(F(c) - F(\alpha)) &\text{ se } \alpha < c
+\end{cases} 
+\end{equation}
+<p>
+ou seja, se o limite inferior de integração for maior que o superior, simplesmente invertemos os dois limites e negamos o resultado da derivada. fazemos isso pois como estaremos fixando \(c\) e estamos <code>map</code>'eando a função <code>h</code> num intervalo, é bem possíveli ocorrerem (e inclusive acontece na maior parte das vezes) casos onde \(x < c\). para evitar problemas de sinal, essa é uma solução bem simples.
+</p>
+
+<p>
+da mesma forma, podemos vizualizar a integral de \(sin(x)\) usando <code>integral</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">plot_2</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">let</span>
+    start <span style="color: #715ab1;">=</span> <span style="color: #715ab1;">-</span>10
+    end <span style="color: #715ab1;">=</span> 10
+    n   <span style="color: #715ab1;">=</span> 400
+    intervalo <span style="color: #715ab1;">=</span> range start end <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">point free notation</span>
+    <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">retorna uma lista com k intervalos</span>
+    f x <span style="color: #715ab1;">=</span> sin x
+  <span style="color: #3a81c3; font-weight: bold;">in</span>
+    file <span style="color: #2d9574;">"img2.png"</span><span style="color: #715ab1;">$</span>
+    plotMapLinear f start end <span style="color: #3a81c3;">(</span>fromIntegral n<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"springgreen"</span>, o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"sin(x)"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> plotMapLinear <span style="color: #3a81c3;">(</span><span style="color: #715ab1;">\</span>x <span style="color: #715ab1;">-&gt;</span> <span style="color: #715ab1;">-</span>cos x<span style="color: #3a81c3;">)</span> start end <span style="color: #3a81c3;">(</span>fromIntegral n<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"firebrick"</span>, o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"integral real = -cos(x)"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> scatter <span style="color: #3a81c3;">(</span>intervalo <span style="color: #6c3163;">(</span>n<span style="color: #715ab1;">-</span>1<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">(</span>integral f <span style="color: #6c3163;">(</span>intervalo n<span style="color: #6c3163;">)</span> <span style="color: #6c3163;">(</span>pi<span style="color: #715ab1;">/</span>2<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"integral aproximada de sin(x)"</span>, o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"tomato"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> legend <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"loc"</span> <span style="color: #2d9574;">"upper right"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> tightLayout
+plot_2
+</pre>
+</div>
+<p>
+<img src="calculo-discreto/img2.png" alt="img2.png" />
+outro exemplo ainda mais divertido é:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">plot_3</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">let</span>
+    start <span style="color: #715ab1;">=</span> 0.1
+    end <span style="color: #715ab1;">=</span> 10
+    n   <span style="color: #715ab1;">=</span> 200
+    intervalo k <span style="color: #715ab1;">=</span> range start end <span style="color: #3a81c3;">(</span><span style="color: #6c3163;">(</span>end <span style="color: #715ab1;">-</span> start<span style="color: #6c3163;">)</span><span style="color: #715ab1;">/</span> k<span style="color: #3a81c3;">)</span>
+    <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">retorna uma lista com k intervalos</span>
+    f <span style="color: #715ab1;">=</span> log
+  <span style="color: #3a81c3; font-weight: bold;">in</span>
+    onscreen <span style="color: #715ab1;">$</span>
+    plotMapLinear f start end n <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"springgreen"</span>, o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"log(x)"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> plotMapLinear <span style="color: #3a81c3;">(</span><span style="color: #715ab1;">\</span>x <span style="color: #715ab1;">-&gt;</span> x <span style="color: #715ab1;">*</span> <span style="color: #6c3163;">(</span><span style="color: #2d9574;">(</span>log x<span style="color: #2d9574;">)</span> <span style="color: #715ab1;">-</span>1<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> start end n <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"firebrick"</span>, o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"integral real = x (log(x) -1)"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> scatter <span style="color: #3a81c3;">(</span>intervalo <span style="color: #6c3163;">(</span>n<span style="color: #715ab1;">-</span>1<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">(</span>integral f <span style="color: #6c3163;">(</span>intervalo n<span style="color: #6c3163;">)</span> 0.00000001<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"integral aproximada de log(x)"</span>, o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"tomato"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> legend <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"loc"</span> <span style="color: #2d9574;">"upper right"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> tightLayout
+</pre>
+</div>
+<p>
+<img src="calculo-discreto/img3.png" alt="img3.png" />
+esse exemplo é divertido porque se me pedirem para integrar \(log(x)\) eu não saberei responder (aposto que utiliza alguma substituição trigonométrica), e ainda sim <code>integral</code> consegue achar facilmente a curva. note que tivemos que escolher \(c\) para um valor muito pequeno, mas não 0, já que a única (possível?) raiz dessa função é quando <code>x</code> é zero (claro, estou fugindo do problema que é definir o valor de \(log(0)\)).
+</p>
+
+<p>
+outro exemplo extremamente bonito é o seguinte:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">plot_4</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">let</span>
+    start <span style="color: #715ab1;">=</span> <span style="color: #715ab1;">-</span>10
+    end <span style="color: #715ab1;">=</span> 10
+    n <span style="color: #715ab1;">=</span> 10000 <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">Int</span>
+    intervalo <span style="color: #715ab1;">=</span> range start end <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">point free notation</span>
+    <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">retorna uma lista com k intervalos</span>
+    f x <span style="color: #715ab1;">=</span> sin<span style="color: #3a81c3;">(</span>x<span style="color: #715ab1;">^</span>2<span style="color: #3a81c3;">)</span>
+  <span style="color: #3a81c3; font-weight: bold;">in</span>
+    onscreen <span style="color: #715ab1;">$</span>
+    plotMapLinear f start end <span style="color: #3a81c3;">(</span>fromIntegral n<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"springgreen"</span>, o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"$sin(x^2)$"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> plot <span style="color: #3a81c3;">(</span>intervalo n<span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">(</span>integral f <span style="color: #6c3163;">(</span>intervalo n<span style="color: #6c3163;">)</span> 0<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"label"</span> <span style="color: #2d9574;">"integral aproximada de $sin(x^2)$"</span>, o2 <span style="color: #2d9574;">"color"</span> <span style="color: #2d9574;">"tomato"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> legend <span style="color: #715ab1;">@@</span> <span style="color: #3a81c3;">[</span>o2 <span style="color: #2d9574;">"loc"</span> <span style="color: #2d9574;">"upper right"</span><span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">%</span> tightLayout
+plot_4 
+</pre>
+</div>
+<p>
+<img src="calculo-discreto/img4.png" alt="img4.png" />
+a beleza deste exemplo advém do fato de que a integral de \(sin(x^2)\) (chamada de <a href="https://en.wikipedia.org/wiki/Fresnel_integral"><i>Fresnel Integral</i></a> ) não possui uma forma <a href="https://en.wikipedia.org/wiki/Nonelementary_integral">elemental</a> (isto é, não pode ser expressa como nenhuma sequência finita das operações comuns que conhecemos), e o máximo que conseguimos fazer é aproximar como uma série de taylor infinita. ainda sim, conseguimos claramente ver um esboço dessa integral.
+</p>
+
+<p>
+enquanto parece ser uma definição contínua, o matplotlib está por trás dos panos fazendo uma interpolação de todos os pontos que fornecemos (quando utilizamos <code>plot</code>).
+</p>
+
+<p>
+podemos usar essas duas integrais famosas para vizualizar um construto ainda mais bonito (e útil): a <a href="https://en.wikipedia.org/wiki/Euler_spiral">espiral de euler</a>. essa espiral é utilizada em diversas áreas de cálculo numérico, e pode ser caracterizada pela seguinte equação paramétrica:
+\[
+C = \forall t \in T: \, (x(t), y(t)) = \left(S(t), C(t)\right) = \left(\int_0^t sin(x^2) \, dx, \int_0^t cos(x^2) \,dx \right)
+\]
+para um domínio \(T\) que definirmos. observando o lado direito da equação, vemos que as integrais calculadas são exatamente o que calculamos na função <code>integral</code>, portanto podemos calcular os pontos <code>xs</code> e <code>ys</code> usando a aproximação dessa integral e vizualizá-la:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">euler</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">let</span> 
+    start <span style="color: #715ab1;">=</span> <span style="color: #715ab1;">-</span>10
+    end <span style="color: #715ab1;">=</span> 10
+    n <span style="color: #715ab1;">=</span> 500 <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">Int</span>
+    intervalo <span style="color: #715ab1;">=</span> range start end <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">point free notation</span>
+    <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">retorna uma lista com k intervalos</span>
+    
+    z <span style="color: #715ab1;">=</span> intervalo n
+    x <span style="color: #715ab1;">=</span> integral <span style="color: #3a81c3;">(</span><span style="color: #715ab1;">\</span>k <span style="color: #715ab1;">-&gt;</span> sin<span style="color: #6c3163;">(</span>k<span style="color: #715ab1;">**</span>2<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> z 0
+    y <span style="color: #715ab1;">=</span> integral <span style="color: #3a81c3;">(</span><span style="color: #715ab1;">\</span>k <span style="color: #715ab1;">-&gt;</span> cos<span style="color: #6c3163;">(</span>k<span style="color: #715ab1;">**</span>2<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span> z 0
+  <span style="color: #3a81c3; font-weight: bold;">in</span>
+    onscreen <span style="color: #715ab1;">$</span> 
+    readData<span style="color: #3a81c3;">(</span>x, y, z<span style="color: #3a81c3;">)</span>
+    <span style="color: #715ab1;">%</span> <span style="color: #3a81c3;">(</span>mp <span style="color: #715ab1;">#</span> <span style="color: #2d9574;">"fig = plot.figure()\n"</span>
+    <span style="color: #715ab1;">#</span> <span style="color: #2d9574;">"ax = fig.add_subplot(projection='3d')\n"</span><span style="color: #3a81c3;">)</span>
+    <span style="color: #715ab1;">#</span> <span style="color: #2d9574;">"ax.plot(data[0], data[1], data[2])\n"</span>
+    <span style="color: #715ab1;">#</span> <span style="color: #2d9574;">"fig.tight_layout()"</span>
+</pre>
+</div>
+<p>
+<img src="calculo-discreto/img5.png" alt="img5.png" />
+eu não sei vocês, mas eu acho isso muito foda. apesar de termos que utilizar algumas coisinhas em python diretamente (o que é um pouco feio honestamente), o cálculo principal é feito nas 3 linhas onde definimos <code>x</code>, <code>y</code> e <code>z</code>.
+</p>
+
+<p>
+o que é ainda mais bonito é o fato de que as funções que usamos para calcular foram definidas de maneira simples, intuitiva e concisa (todas juntas não passam de 30 linhas de código), não possuem nada de arbitrário ou de incoerência e (portanto) são extremamente gerais no que fazem. enquanto é fato que haskell não é a linguagem mais rápida do mundo, eu encontrei muito mais facilidade de definir essas funções nela do que em julia, a linguagem utilizada na cadeira de cálculo numérico.
+</p>
+
+<p>
+apesar disso, tenho que admitir que fazer plots em julia era muito, mas muito mais fácil do que fazer em haskell, e acho que se alguém algum dia sonha em fazer uma linguagem funcional mainstream, faz-se necessário (de caráter urgente) um bom suporte para gráficos; o melhor que eu consegui achar foi esse pequeno <i>hack</i> de invocar matplotlib de dentro de haskell.
+</p>
+
+<p>
+dentro do tópico de cálculo numérico, acho que ainda restam alguns assuntos interessantes que merecem atenção, em especial integrais duplas e derivadas parciais. entretanto não pretendo me estender muito mais neste post; e quem sabe falarei novamente delas no futuro.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: Mar 18, 2022-001647572400</p>
+<p class="author">Author: @o-santi</p>
+<p class="date">Created: Aug  9, 2022-001660067135</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

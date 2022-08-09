@@ -1,0 +1,5 @@
+let base = "/home/santi/sssg/" 
+let site = "/home/santi/sssg/_site/" 
+let sections = "/home/santi/sssg/sections/"
+let site_posts = "/home/santi/sssg/_site/posts/" 
+let site_styles = "/home/santi/sssg/_site/styles/" 

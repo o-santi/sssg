@@ -1,0 +1,13 @@
+open Base
+
+let render =
+  <%s! Header.render %>
+  <div class="center">
+      <article>
+          <p>estudante de ciência da computação na ufrj. gosto de matematica, programação funcional, teoria dos tipos, criptografia, teoria dos grupos, compiladores, programas bonitos e programas idiotas.</p>
+          <p>também gosto de linguagens de programação não convencionais, como agda, coq, haskell e ocaml.</p>
+          <p>este site foi gerado utilizando a ferramenta <a href="https://github.com/o-santi/sssg">sssg</a> (<italic>santi's static site generator</italic>), cujo autor, não surpreendentemente, sou eu. </p>
+      </article>
+      <%s! Navbar.render %>
+  </div>
+  <%s! Footer.render %>

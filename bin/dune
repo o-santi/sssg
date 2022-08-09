@@ -1,0 +1,5 @@
+(executable
+ (public_name sssg)
+ (name main)
+ (preprocess (pps ppx_jane))
+ (libraries sssg stdio))

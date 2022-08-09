@@ -1,0 +1,420 @@
+/* Most of these configs come from
+  https://loup-vaillant.fr/css/style.css
+  because i really like his syle */
+
+
+/*************/
+/* Web fonts */
+/*************/
+
+:root {
+    --first: #FDFCE5;
+    --second: #F9F3DF;
+    --third: #D7E9F7;
+    --fourth: #F4D19B;
+}
+
+@font-face{
+    font-family: 'Source Sans Pro';
+    font-weight: 400;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('EOT/SourceSansPro-Regular.eot') format('embedded-opentype'),
+         url('WOFF2/TTF/SourceSansPro-Regular.ttf.woff2') format('woff2'),
+         url('WOFF/OTF/SourceSansPro-Regular.otf.woff') format('woff'),
+         url('OTF/SourceSansPro-Regular.otf') format('opentype'),
+         url('TTF/SourceSansPro-Regular.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Source Sans Pro';
+    font-weight: 400;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('EOT/SourceSansPro-It.eot') format('embedded-opentype'),
+         url('WOFF2/TTF/SourceSansPro-It.ttf.woff2') format('woff2'),
+         url('WOFF/OTF/SourceSansPro-It.otf.woff') format('woff'),
+         url('OTF/SourceSansPro-It.otf') format('opentype'),
+         url('TTF/SourceSansPro-It.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Source Sans Pro';
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('EOT/SourceSansPro-Semibold.eot') format('embedded-opentype'),
+         url('WOFF2/TTF/SourceSansPro-Semibold.ttf.woff2') format('woff2'),
+         url('WOFF/OTF/SourceSansPro-Semibold.otf.woff') format('woff'),
+         url('OTF/SourceSansPro-Semibold.otf') format('opentype'),
+         url('TTF/SourceSansPro-Semibold.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Source Sans Pro';
+    font-weight: 600;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('EOT/SourceSansPro-SemiboldIt.eot') format('embedded-opentype'),
+         url('WOFF2/TTF/SourceSansPro-SemiboldIt.ttf.woff2') format('woff2'),
+         url('WOFF/OTF/SourceSansPro-SemiboldIt.otf.woff') format('woff'),
+         url('OTF/SourceSansPro-SemiboldIt.otf') format('opentype'),
+         url('TTF/SourceSansPro-SemiboldIt.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Source Code Pro';
+    font-weight: 400;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('EOT/SourceCodePro-Regular.eot') format('embedded-opentype'),
+         url('WOFF2/TTF/SourceCodePro-Regular.ttf.woff2') format('woff2'),
+         url('WOFF/OTF/SourceCodePro-Regular.otf.woff') format('woff'),
+         url('OTF/SourceCodePro-Regular.otf') format('opentype'),
+         url('TTF/SourceCodePro-Regular.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Source Code Pro';
+    font-weight: 400;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('EOT/SourceCodePro-It.eot') format('embedded-opentype'),
+         url('WOFF2/TTF/SourceCodePro-It.ttf.woff2') format('woff2'),
+         url('WOFF/OTF/SourceCodePro-It.otf.woff') format('woff'),
+         url('OTF/SourceCodePro-It.otf') format('opentype'),
+         url('TTF/SourceCodePro-It.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Source Code Pro';
+    font-weight: 700;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('EOT/SourceCodePro-Bold.eot') format('embedded-opentype'),
+         url('WOFF2/TTF/SourceCodePro-Bold.ttf.woff2') format('woff2'),
+         url('WOFF/OTF/SourceCodePro-Bold.otf.woff') format('woff'),
+         url('OTF/SourceCodePro-Bold.otf') format('opentype'),
+         url('TTF/SourceCodePro-Bold.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Source Code Pro';
+    font-weight: 700;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('EOT/SourceCodePro-BoldIt.eot') format('embedded-opentype'),
+         url('WOFF2/TTF/SourceCodePro-BoldIt.ttf.woff2') format('woff2'),
+         url('WOFF/OTF/SourceCodePro-BoldIt.otf.woff') format('woff'),
+         url('OTF/SourceCodePro-BoldIt.otf') format('opentype'),
+         url('TTF/SourceCodePro-BoldIt.ttf') format('truetype');
+}
+
+/*********************************************/
+/* Reset, from                               */
+/* http://meyerweb.com/eric/tools/css/reset/ */
+/* v2.0 | 20110126                           */
+/*********************************************/
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p,
+blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img,
+ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center,
+dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody,
+tfoot, thead, tr, th, td, article, aside, canvas, details, embed,figure,
+figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* Re-styled sup/super scripts (not sure we should reset them at all...) */
+sub {
+    vertical-align: sub;
+    font-size: 80%;
+}
+sup {
+    vertical-align: super;
+    font-size: 80%;
+}
+html {
+    font-size: 18px;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1, "tnum" 1;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, pre code {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    padding-left: 1rem;
+    list-style: disc;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after, q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+html {
+    /* background-image:url(../img/2.png); */
+    /* background-repeat: no-repeat; */
+    /* background-position: center top; */
+    /* background-origin: content-box; */
+    width : 100%;
+    height: 100%;
+}
+
+#clear{
+    clear: both;
+}
+/*************/
+/* end reset */
+/*************/
+
+blockquote {
+    padding-left: 1rem;
+    border-left: medium solid #aaa;
+}
+
+/* Links*/
+article a {
+    text-decoration: none;
+    border-bottom: thin dotted #808080;
+}
+
+article a:hover {
+    color: var(--third);
+    text-decoration: none;
+    border-bottom: none;
+}
+
+/* fonts */
+code {
+    font-family: "Source Code Pro", monospace;
+    font-size: 95%;
+}
+body {
+    font-family: "Source Sans Pro", sans-serif;
+    background-color:var(--first);
+}
+strong {
+    font-weight: 600;
+}
+em {
+    font-style: italic;
+}
+
+/* non-main elements */
+header #logo {
+    float: right;
+    /* padding-top: 1rem; */
+}
+
+footer {
+    background-color: var(--fourth);
+    border-radius : 1.5rem;
+    padding: 0.4rem 1.5rem 0.4rem 1.5rem;
+    margin: 0 4rem 1.6rem 2rem;
+}
+
+/* Navigation bar */
+nav a {
+    width: 225px;
+    color: black;
+    border-bottom: thin solid #aaa;
+    display: block;
+    padding: 0.3rem 0.4em 0.3rem 0.4em;
+    text-decoration: none;
+    font-size: 115%
+}
+nav a:hover {
+    background-color: var(--fourth);
+}
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+nav ul ul {
+    padding-left: 2rem; /* Indentation */
+    padding-bottom: 0.6rem; /* Slightly marks end of list. Optionnal */
+}
+img {
+    display: block;
+    margin: auto;
+}
+
+
+pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: var(--second);
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+pre.src {
+    position: relative;
+    overflow: auto;
+}
+pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #CE9461;
+}
+
+
+.footpara { display: inline; }
+.footdef  { margin-bottom: 1em; }
+.figure { padding: 1em; }
+.figure p { text-align: center; }
+.equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+.equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+
+/* vertical rythm */
+body {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+    font-variant: small-caps;
+}
+h1 {
+    font-size: 150%;
+    margin-bottom: 0.6rem;
+}
+h2 {
+    font-size: 130%;
+    margin: 0.6rem 0 0.6rem 0;
+    font-feature-settings: "smcp" 1;
+}
+h3 {
+    font-size: 110%;
+    margin: 0.6rem 0 0.6rem 0;
+    font-feature-settings: "smcp" 1;
+}
+h4 {
+    font-weight: 600;
+    font-size: 110%;
+    margin: 0.6rem 0 0.6rem 0;
+}
+p, ul, ol {
+    margin: 0 0 1.4rem 0;
+}
+
+/* desktop layout */
+body {
+    max-width: 1200px;
+    margin: 0 auto 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+header {
+    flex: none;
+    margin: 1rem 1rem 2.7rem 1rem;
+}
+header h1 {
+    font-size: 280%;
+    font-variant: none;
+    margin: 0 0 0 0;
+}
+footer {
+    flex: none;
+    margin: 1rem 1rem 10rem 1rem;
+}
+.center {
+    display: flex;
+    flex: 1;
+    padding: 0 1rem 0 1rem;
+}
+nav {
+    order: -1;
+    flex: 0 0 18rem;
+    margin: 0 2rem 0 0;
+}
+article {
+    flex: 1;
+}
+
+.post-list {
+    list-style:none;
+}
+
+.post-date {
+    color:#9b9b9b;
+    font-size:.8rem
+}
+
+.post-item a {
+    color: black;
+    text-decoration: none !important;
+}
+
+.post-item a:hover {
+    color: var(--fourth);
+}
+
+#text-table-of-contents ul {
+    list-style: none;
+    padding: 0px;
+    margin-left: 10px;
+}
+
+/* mobile layout */
+@media (max-width:1000px) {
+    header h1 {
+        font-size: 2.8rem;
+        margin-bottom: 0.2rem;
+    }
+    body {
+        max-width: 100%;
+        margin: 1 0 1 0;
+        flex-direction: column;
+    }
+    .center {
+        flex-direction: column;
+    }
+    nav {
+        order: 1;
+        flex: 0 0 auto;
+    }
+    .left-bar {
+	margin-bottom: 1rem;
+    }
+    
+}

@@ -1,0 +1,29 @@
+open Soup.Infix
+
+let parse_post filepath =
+  Stdio.print_endline filepath;
+  let soup = Soup.read_file filepath |> Soup.parse in
+  let toc = soup $ "#text-table-of-contents" |> Soup.to_string in
+  Soup.delete (soup $ "#table-of-contents");
+  let body = soup $ ".content" |> Soup.to_string in
+  let title_tag = soup $ ".title" in
+  Soup.set_attribute "id" "title" title_tag;
+  let title = title_tag |> Soup.R.leaf_text in
+  let filename = Filename.remove_extension (Filename.basename filepath) in
+  (body, toc, title, filename)
+
+let render filepath =
+  <%s! Header.render %>
+  <div class="center">
+      <% let (body, toc, title, filename) = parse_post filepath in %>
+      <div class="left-bar">
+          <%s! Navbar.render %>
+          <nav class="toc">
+              <a href="#top"><%s title %></a>
+              <%s! toc  %>
+              <a href="./<%s filename %>.pdf">Ver em pdf</a>
+          </nav>
+      </div>
+      <%s! body %>
+  </div>
+  <%s! Footer.render %>

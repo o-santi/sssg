@@ -1,0 +1,6 @@
+(include_subdirs unqualified)
+
+(library
+ (name sssg)
+ (libraries stdio core_compat dream lambdasoup))
+

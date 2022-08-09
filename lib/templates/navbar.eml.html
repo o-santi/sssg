@@ -1,0 +1,10 @@
+let render =
+  let groups = Core_compat.Sys_unix.ls_dir Filepaths.sections in
+  <nav>
+    <a href="/"> sobre </a>
+    <ul>
+      <% Base.List.iter groups ~f:begin fun (name) -> %>
+      <li><a href="/<%s name %>"> <%s name %> </a></li>
+      <% end; %>
+    </ul>
+  </nav>

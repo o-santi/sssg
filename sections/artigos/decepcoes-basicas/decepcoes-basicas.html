@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- Aug  9, 2022-001660068771 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>decepções básicas</title>
+<meta name="author" content="santi" />
+<meta name="description" content="ah! que belo o mundo seria se 77 + 33 = 100..." />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+</style>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">decepções básicas</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgbcc964a">1. tristezas e mais tristezas</a></li>
+<li><a href="#org3a7e13c">2. subvertendo a realidade</a></li>
+<li><a href="#org907bccb">3. generalizando&#x2026;</a></li>
+<li><a href="#orgd954c1d">4. adendos finais</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgbcc964a" class="outline-2">
+<h2 id="orgbcc964a"><span class="section-number-2">1.</span> tristezas e mais tristezas</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+ah! que belo o mundo seria se
+</p>
+
+<p>
+\[ 77 + 33 = 100\]
+</p>
+
+<p>
+mas infelizmente não é o que acontece. vivemos num mundo falho e imperfeito, a vida é arbitrária e sem sentido, não há motivo para sequer procurar estender nossa estada aqui, tudo é fútil e inócuo e devemos todos cometer suicídio.
+</p>
+
+<p>
+ou será que não acontece?
+</p>
+
+<p>
+bases numéricas são um assunto extremamente arbitrário: na maior parte do tempo usamos bases decimais, mas inconscientemente utilizamos outras bases em outros contextos, seja para o tempo (já reparou como 0.5 horas são 30 minutos?), seja para contar ovos (de 12 em 12) ou mesmo na linguagem mística dos computadores: binário.
+</p>
+
+<p>
+fato é que, para toda base numérica \(x\), podemos calcular o valor de seus digitos com a formula geral:
+</p>
+
+<p>
+\[ valor = a_k x^{k} + a_{k-1} x^{k-1} + ... + a_2 x^{2} + a_1 x^{1} + a_0 x^{0} \]
+</p>
+
+<p>
+ou, simplificando
+</p>
+
+<p>
+\[ valor = \sum_{i=0}^{k} a_i x^{i} \]
+</p>
+
+<p>
+para o caso decepcionante supracitado, podemos dissecá-lo como
+</p>
+
+<p>
+\[ 7 \cdot 10^{1} +  7 \cdot 10^{0} + 3 \cdot 10^{1} + 3 \cdot 10^{0} =  1 \cdot 10^{3} \]
+</p>
+
+<p>
+e, interessantemente re-agrupá-lo como
+</p>
+
+<p>
+\[ 7 (10^{1} + 10^{0}) + 3 (10^{1} + 10^{0}) = 1 (10^{2})\]
+</p>
+
+<p>
+curiosamente, ou não curiosamente, muitos alunos do <i>ótimo</i> sistema de educação brasileiro já se encontraram de frente com a expressão entre parênteses: sim, é a soma de uma progressão geométrica. e para os que não lembram, podemos facilmente achar a fórmula fechada para tal com:
+</p>
+
+<p>
+\[ S_{pg} = x^{k} + x^{k-1} + x^{k-2} + ... + x^{2} + x^{1} + x^{0} \]
+</p>
+
+<p>
+\[ x \cdot S_{pg} = x^{k+1} + x^{k} + x^{k-1} + ... + x^{3} + x^{2} + x^{1} \]
+</p>
+
+<p>
+\[ x \cdot S_{pg} - S_{pg} = x^{k+1} - x^{0} \]
+</p>
+
+<p>
+\[ S_{pg} = \frac{x^{k+1} - x^{0}}{x - 1}\]
+</p>
+
+<p>
+E vemos que, não surpreendentemente,
+</p>
+
+<p>
+\[  \frac{10^{2} - 1}{10 - 1} = \frac{99}{9} = (10^1 + 10^0) = 11\]
+</p>
+
+<blockquote>
+<p>
+ok, entendi, matemática chata, e dai?
+</p>
+</blockquote>
+<p>
+acalme-se jovem padawan, estamos apenas começando.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3a7e13c" class="outline-2">
+<h2 id="org3a7e13c"><span class="section-number-2">2.</span> subvertendo a realidade</h2>
+<div class="outline-text-2" id="text-2">
+<blockquote>
+<p>
+quando a verdade dói, ignore-a e crie a sua própria
+</p>
+</blockquote>
+<p>
+provavelmente ninguém nunca disse isso. mas é verdade: quando os fatos não estão a seu favor, apenas os ignore. é simples assim. portanto, definemos aqui a base \(b\) tal que
+</p>
+
+<p>
+\[ 77_b + 33_b = 100_b \]
+</p>
+
+<p>
+onde a notação \(número_b\) indica que \(número\) é calculado na base \(b\). sabemos que, para nossa base ser válida, precisa satisfazer
+</p>
+
+<p>
+\[ 7(b^{1} + b^{0}) + 3(b^{1} + b^{0}) = b^{2} \]
+</p>
+
+<p>
+\[ (b^{1} + b^{0})(7 + 3) = b^{2} \]
+</p>
+
+<p>
+e, portanto, pela fórmula da soma de pg,
+</p>
+
+<p>
+\[ 10 \left( \frac{b^{2} -1}{b - 1} \right) = b^2 \]
+</p>
+
+<p>
+resolvendo um pouco mais,
+</p>
+
+<p>
+\[ 10b^2 - 10 = b^3 - b^2 \]
+</p>
+
+<p>
+\[ b^3 - 11b^2 + 10 = 0\]
+</p>
+
+<p>
+essa fórmula nos dá, então, três possíveis valores para \(b\). um deles é trivial: \(b=1\), visto que \(1 + 11 - 10\) realmente <i>é igual</i> a 0. entretanto, as outras duas soluções são muito mais interessantes: \(b = 5 \pm \sqrt{35}\)
+</p>
+
+<p>
+e, ainda mais entusiasticamente, <i>apenas um</i> desses valores é de fato positivo: \(5 + \sqrt{35}\), e portanto sabemos que
+</p>
+
+<p>
+\[ 77_{5 + \sqrt{35}} + 33_{5 + \sqrt{35}} = 100_{5 + \sqrt{35}}\]
+</p>
+
+<p>
+<b>eureka!</b>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org907bccb" class="outline-2">
+<h2 id="org907bccb"><span class="section-number-2">3.</span> generalizando&#x2026;</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+por que parar com \(77 + 33 = 100\)? por quê não \(777 + 333 = 1000\)? ou \(7777 + 3333 = 10000\)? realmente, não precisamos parar nessas quantidades de dígitos arbitrários, podemos ir <b>além</b>. Portanto, seja \(B(n)\) a base necessária para que
+</p>
+
+<p>
+\[ 77...7_{B(n)} (n~digitos) + 33...3_{B(n)} (n~digitos) = 10....0_{B(n)}(n+1~digitos) \] 
+</p>
+
+<p>
+sabemos que a fórmula
+</p>
+
+<p>
+\[ 7 (B(n)^{n} + ... + B(n)^1 +B(n)^0) + 3 (B(n)^{n} + ... +B(n)^1 +B(n)^0) =B(n)^{n+1}\]
+</p>
+
+<p>
+deve ser satisfeita. portanto
+</p>
+
+<p>
+\[ 10 \left( \frac{B(n)^{n+1} - 1}{B(n)- 1} \right) =B(n)^{n+1}\]
+</p>
+
+<p>
+logo, organizando a equação, e usando a fórmula da soma de pg, achamos nossa fórmula geral para \(B(n)\):
+</p>
+
+<p>
+\[ B(n)^{n+2} - 11 B(n)^{n+1} + 10 = 0\]
+</p>
+
+<p>
+<b>eureka!\(^2\)</b>
+</p>
+
+<p>
+desse modo, para qualquer quantidade de dígitos \(n\), podemos calcular, <i>dada suficiente quantidade de magia negra</i>, sua respectiva <b>base ideal</b>. por essa fórmula, podemos, por exemplo, achar a resposta para a \(B(2)\):
+</p>
+
+<p>
+\[ B(2) = \frac{1}{3} \left(10 + \sqrt[3]{1585 - 15 \sqrt{1401}} + \sqrt[3]{5 (317 + 3 \sqrt{1401})} \right)\]
+</p>
+
+<p>
+para o caso \(B(3)\), apesar de o wolfram alpha encontrar <i>de maneira mística</i> a solução exata, não irei incluí-la pois é <b>enorme</b>
+</p>
+
+<p>
+e não respondo para o caso de \(B(4)\) em diante pois nem o wolframalpha foi capaz de empregar <i>magia negra</i> suficiente para encontrar a solução exata, apesar de serem equações relativamente simples.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd954c1d" class="outline-2">
+<h2 id="orgd954c1d"><span class="section-number-2">4.</span> adendos finais</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+alguns podem já ter notado que a base \(b\) não funcionará <i>apenas</i> para o caso \(77_b + 33_b = 100_b\). de fato, quaisquer dois números que somem para 10 irão funcionar nessa equação, portanto \(66_b + 44_b = 100_b\) ou \(88_b + 22_b = 100_b\).
+</p>
+
+<p>
+outro caso curioso é para \(B(0)\): vemos que \(B(0)^2 - 11 B(0) + 10 = 0\) tem duas soluções interessantes \(B(0)_1 = 1\) e \(B(0)_2 = 10\). enquanto ainda não sei direito como interpretar o caso onde 1 é o resultado, \(B(0) = 10\) nos diz que
+</p>
+
+<p>
+\[ 7 \cdot 10^0 + 3 \cdot 10^0 = 10^1 \]
+</p>
+
+<p>
+ou, simplesmente,
+</p>
+
+<p>
+\[ 7 + 3 = 10\]
+</p>
+
+<p>
+além disso, deixei propositalmente escondido um fato bem importante: as equações possuirão graus cada vez maiores e eu não provei que \(B(n)\) será sempre um número real (pois pode muito bem acontecer que todas as soluções de \(B(n)\) sejam imaginárias, até então). pois bem, apesar de acreditar que tal fato seja verdadeiro, <b>eu não sei como provar isso</b>, e portanto deixo aqui a <b>conjectura de santi</b>:
+</p>
+
+<p>
+\(\forall n \in \mathbb{N}, n \geq 0\), \(\exists! k \in \mathbb{R}, k > 0\) tal que
+</p>
+
+<p>
+\[k^{n+2} - 11 k^{n+1} + 10 = 0 \]
+</p>
+
+<p>
+onde \(k\) é a <i>única</i> solução real positiva para a fórmula geral de \(B(n)\). apesar de não saber provar, realmente acredito que essa afirmação seja verdadeira.
+</p>
+
+<p>
+e sim, eu também ainda não sei bem como definir <i>uma base não inteira</i>, mas isso fica como dever de casa para àqueles que acreditam que matemática deve sempre ser aplicável à vida real.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: Feb 23, 2021-001614049200</p>
+<p class="author">Author: santi</p>
+<p class="date">Created: Aug  9, 2022-001660068771</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

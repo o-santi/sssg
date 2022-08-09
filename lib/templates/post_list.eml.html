@@ -1,0 +1,48 @@
+open Soup.Infix
+
+let parse_posts dir =
+  let files = Core_compat.Sys_unix.ls_dir (Filepaths.sections ^ dir) in
+  Base.List.map files ~f:(fun filename ->
+      let abs_path = (Filepaths.sections ^ dir ^ "/" ^ filename ^ "/" ^ filename ^ ".html") in
+      let soup = Soup.read_file abs_path |> Soup.parse in
+      let title = soup $ ".title" |> Soup.R.leaf_text in
+      let date = soup $ ".date" |> Soup.R.leaf_text in
+      let fmt_date = Base.String.sub date ~pos:6 ~len:12 in
+      let epoch = Base.Int.of_string (Base.String.sub date ~pos:19 ~len:12) in
+      (* this is dumb, i should 100% have used use regex
+         but it is too complicated in ocaml so i gave up*)
+      let first_paragraph =
+        match soup $? "meta[name=\"description\"]" with
+          | Some tag -> Soup.R.attribute "content" tag
+          | None -> "COLOCAR DESCRICAO AQUI BUNDA MOLE"
+      in
+      (filename, title, first_paragraph, fmt_date, epoch)
+    )
+
+let order_posts posts =
+  Base.List.sort posts ~compare:(
+    fun (p1) -> fun (p2) ->
+                match p1, p2 with
+                | (_, _, _, _, e1), (_, _, _, _, e2) -> Int.compare e2 e1) 
+
+let parse_index dir =
+  Stdio.In_channel.read_all (Filepaths.sections ^ dir ^ "/index.html")
+
+let render dir =
+Stdio.print_endline dir;
+  let files = Core_compat.Sys_unix.ls_dir (Filepaths.sections ^ dir) in
+  let show_posts_p = not (Base.List.mem files "index.html" ~equal:Base.String.equal) in
+  <% if  show_posts_p then ( %>
+  <% let posts = order_posts (parse_posts dir) in %>
+  <ul class="post-list">
+      <% Base.List.iter posts ~f:begin fun (filename, title, first_p, date, _epoch) -> %>
+      <li class="post-item">
+          <time class="post-date"><%s date %></time>
+          <a href="/<%s dir %>/<%s filename %>"><h2><%s title %></h2></a>
+          <p><%s first_p %></p>
+      </li>
+      <% end; %>
+  </ul>
+  <% ) else ( %>
+  <%s! parse_index dir %>
+  <% );%>

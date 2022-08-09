@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- Aug  9, 2022-001660069197 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>gramáticas, computadores e expressões matemáticas</title>
+<meta name="author" content="@o-santi" />
+<meta name="description" content="sobre a implementação de uma mini-calculadora, e as dificuldades nessa empreitada" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+</style>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">gramáticas, computadores e expressões matemáticas</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org1dd2c48">1. computadores e linguagens</a></li>
+<li><a href="#org4194fe0">2. terminologia e definições</a></li>
+<li><a href="#org7a456b3">3. expressões matemáticas</a></li>
+<li><a href="#org50c594d">4. autômatos de pilha</a></li>
+<li><a href="#orgdfe9b24">5. implementando &#x2026;</a></li>
+<li><a href="#org126a7fd">6. os problemas</a></li>
+<li><a href="#org6bd1d32">7. as soluções</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org1dd2c48" class="outline-2">
+<h2 id="org1dd2c48"><span class="section-number-2">1.</span> computadores e linguagens</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+computadores para a maior parte das pessoas parecem máquinas sobrenaturais, que de alguma maneira misturam zeros e uns para produzir através de métodos misteriosos aplicativos extremamente avançados como youtube e whatsapp. a relação entre esses aplicativos e as sequências em binários, por mais obtusa que seja, é dada através das linguagens de programação; isto é, essa linguagens fazem a ponte entre o código diretamente entendido pela máquina e o que nós seres humanos conseguimos compreender, abstraindo diversos conceitos para facilitar a vida do programador.
+</p>
+
+<p>
+entretanto, ainda resta a questão: como o computador consegue entender essas linguagens de programação de modo a transformá-la em um código de máquina correto? a resposta é magia! brincadeira, <i>quase</i>, compiladores. porém, explicar o funcionamento um compilador como o <i>gcc</i> com suas 7.3 milhões de linhas de código levaria alguns séculos (e não sei se existe algum ser humano que entende <i>completamente</i> todo o gcc), então me satisfarei em explicar aqui uma linguagem mais simples: expressões matemáticas.
+</p>
+
+<p>
+de fato, se você abrir o google agora e digitar \(9 * (4 + 4)\) verá que ele te dará a resposta \(72\). num primeiro momento, podemos pensar que ele executa as instruções sequencialmente, na ordem em que elas aparecem na expressão, mas rapidamente percebemos que isso não funciona para todos os casos. na verdade, nem para o caso dado essa estratégia funciona, pois teríamos \(9 * 4 = 36 + 4 = 40\) que até hoje não é igual a \(72\), e portanto fica claro que ele precisa de alguma maneira de entender a estrutura, a hierarquia das operações para calcular corretamente.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4194fe0" class="outline-2">
+<h2 id="org4194fe0"><span class="section-number-2">2.</span> terminologia e definições</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+considerarei aqui que o leitor possui o míminimo conhecimento sobre a terminologia das linguagens regulares. caso não conheça, todas as definições podem ser encontradas nos meus posts anteriores, em especial: <a href="https://o-santi.github.io/universidade/expressoes_regulares/">expressões regulares</a>, <a href="https://o-santi.github.io/universidade/gramaticas/">gramáticas regulares</a> e <a href="https://o-santi.github.io/universidade/linguagenslivresdecontexto/">gramáticas livres de contexto</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7a456b3" class="outline-2">
+<h2 id="org7a456b3"><span class="section-number-2">3.</span> expressões matemáticas</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+vimos anteriormente que podemos definir uma gramática \(G_{exp}\) muito simples que define todas as possíveis expressões que possuem soma e multiplicação. para simplificar, podemos transformar uma expressão do tipo
+\[
+(a * b) + c
+\]
+em
+\[ 
+(id * id) + id
+\]
+visto que o nome das variáveis nas estruturas é arbitrário, e é muito mais fácil nomeá-las todas pelo mesmo símbolo e guardar os valores em outro lugar (pense que cada símbolo na verdade é um token com várias características, uma delas sendo o valor guardado na variável). portanto, podemos definir o conjunto de terminais como \(T = \{id, +, * , (, ) \}\), e as regras como:
+</p>
+\begin{align*}
+S &\rightarrow E\\
+E &\rightarrow E + E\\
+E &\rightarrow E * E\\
+E &\rightarrow (E)\\
+E &\rightarrow id
+\end{align*}
+<p>
+onde \(S\) é o símbolo inicial da gramática. entretanto essa gramática tem um problema: ela é ambígua. isto é, ela possui palavras que tem mais de uma derivação possível. por exemplo, a expressão:
+\[
+id + id * id
+\]
+pode ser derivada das seguintes maneiras:
+</p>
+\begin{align*}
+S \rightarrow E + {\color{red} E} \rightarrow E + {\color{red} E * E} \rightarrow id + {\color{red}id * id} = id + (id * id)\\
+S \rightarrow {\color{red}E} * E \rightarrow {\color{red} E + E} * E \rightarrow {\color{red}id + id} * id = (id + id) * id
+\end{align*}
+<p>
+apesar de parecer ínfima, essa ambiguidade significa que um possível compilador não conseguiria decidir qual das duas operações deve ser executadas primeiro (sem definir por exemplo uma hierarquia de operações). enquanto existem linguagens que são inerentemente ambíguas, isto é, independente da gramática sempre existirá ao menos uma palavra com mais de uma derivação, esse não é o caso da nossa linguagem acima. adicionando novos símbolos e novas regras, podemos eliminar essa ambiguidade:
+</p>
+\begin{align*}
+E &\rightarrow E + T\\
+E &\rightarrow T\\
+T &\rightarrow T * F\\
+T &\rightarrow F\\
+F &\rightarrow (E)\\
+F &\rightarrow id
+\end{align*}
+<p>
+embora provar que essa gramática não é ambígua seja difícil, a intuição é simples: só podemos multiplicar uma soma utilizando os parenteses, e portanto a única maneira de derivar a palavra \(id + id * id\) seria primeiro fazendo a multiplicação e depois a soma.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org50c594d" class="outline-2">
+<h2 id="org50c594d"><span class="section-number-2">4.</span> autômatos de pilha</h2>
+<div class="outline-text-2" id="text-4">
+<blockquote>
+<p>
+tudo bem, eu tenho a gramática que descreve as expressões matemáticas e define uma hierarquia. e agora? como eu enfio ela no meu computador?
+</p>
+</blockquote>
+<p>
+acalme-se senhor leitor, eu ia explicar agora. assim como no caso das expressões regulares, onde podíamos construir um autômato que as aceitasse, podemos algoritmicamente construir um autômato um pouco mais <i>sofisticado</i> que aceite as linguagens livres de contexto.
+</p>
+
+<p>
+a ideia principal desses novos autômatos é introduzir uma memória, mais especificamente uma estrutura de pilha, que simula as transições de uma gramática. isto é, colocamos os símbolos que são transformados diretamente na pilha, e o topo da pilha (o caracter mais à esquerda) será utilizado como entrada para a função de transição também.
+</p>
+
+<p>
+quando o topo da pilha e o símbolo mais à esquerda da palavra forem o mesmo, podemos retirar ambos da pilha, visto que um terminal não pode ser transformado pela definição de gramática livre de contexto. essa função de transição, entretanto, ainda é uma função não-determinística, então a emulação desse autômato deve levar isso em conta
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgdfe9b24" class="outline-2">
+<h2 id="orgdfe9b24"><span class="section-number-2">5.</span> implementando &#x2026;</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+existem inúmeras maneiras de implementar autômatos de pilha, entretanto num primeiro momento escolhi a maneira que me pareceu mais intuitiva e simples: classes. o estado, o input e a pilha serão propriedades da classe <code>Automato</code> e a função de transição um método. além disso, escolhi python simplesmente porque é a linguagem mais legível e simples para iniciantes.
+</p>
+
+<p>
+logo, podemos implementar o autômato com o seguinte excerto:
+</p>
+<div class="org-src-container">
+<pre class="src src-python">  <span style="color: #3a81c3; font-weight: bold;">class</span> <span style="color: #ba2f59; font-weight: bold;">Automato</span>:
+  
+      <span style="color: #da8b55;">"""</span>
+<span style="color: #da8b55;">      Classe que representa um estado de um aut&#244;mato</span>
+<span style="color: #da8b55;">      """</span>
+  
+      <span style="color: #3a81c3; font-weight: bold;">def</span> <span style="color: #6c3163; font-weight: bold;">__init__</span><span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">self</span>, input_string: <span style="color: #3a81c3;">str</span>, pilha: <span style="color: #3a81c3;">str</span>, regras: <span style="color: #3a81c3;">dict</span><span style="color: #6c3163;">[</span><span style="color: #3a81c3;">str</span>, <span style="color: #3a81c3;">list</span><span style="color: #2d9574;">[</span><span style="color: #3a81c3;">str</span><span style="color: #2d9574;">]</span><span style="color: #6c3163;">]</span><span style="color: #3a81c3;">)</span>:
+          <span style="color: #3a81c3; font-weight: bold;">self</span>.input_string = input_string
+          <span style="color: #3a81c3; font-weight: bold;">self</span>.<span style="color: #715ab1;">pilha</span> = pilha
+          <span style="color: #3a81c3; font-weight: bold;">self</span>.<span style="color: #715ab1;">regras</span> = regras
+</pre>
+</div>
+<p>
+aqui, nós assumimos que o dicionário das regras é da forma
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #715ab1;">regras</span> = <span style="color: #3a81c3;">{</span> variavel : transicoes <span style="color: #3a81c3;">}</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;"># </span><span style="color: #2aa1ae; background-color: #ecf3ec;">no caso das express&#245;es matem&#225;ticas, podemos defin&#237;-lo como</span>
+<span style="color: #715ab1;">regras</span> = <span style="color: #3a81c3;">{</span><span style="color: #2d9574;">"S"</span>:<span style="color: #6c3163;">[</span><span style="color: #2d9574;">"E"</span><span style="color: #6c3163;">]</span>, <span style="color: #2d9574;">"E"</span> : <span style="color: #6c3163;">[</span><span style="color: #2d9574;">"E+T"</span>, <span style="color: #2d9574;">"T"</span><span style="color: #6c3163;">]</span>, <span style="color: #2d9574;">"T"</span>: <span style="color: #6c3163;">[</span><span style="color: #2d9574;">"T*F"</span>, <span style="color: #2d9574;">"F"</span><span style="color: #6c3163;">]</span>, <span style="color: #2d9574;">"F"</span>:<span style="color: #6c3163;">[</span><span style="color: #2d9574;">"(E)"</span>, <span style="color: #2d9574;">"id"</span><span style="color: #6c3163;">]</span><span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+<p>
+pois facilita na hora de adicionar os novos símbolos na pilha. note também que não precisamos explicitamente guardar o estado (inicial ou final) do autômato, visto que todas as transições fora a primeira (que coloca o símbolo inicial \(S\) na pilha) estarão no estado final. portanto, se iniciarmos o nosso cálculo direto com \(S\) na pilha, não precisamos checar se o autômato está no estado final.
+</p>
+
+<p>
+entretanto, temos um problema claro com essa implementação: a função de transição <b>não</b> é determinística. isso significa que existirão casos (e eles serão frequentes) onde temos mais de uma possível escolha para a saída da função. e um autômato desse estilo não pode simplesmente possuir múltiplos estados ao mesmo tempo.
+</p>
+
+<p>
+a solução portanto é, ao invés de alterar o estado do autômato, simplesmente fazer com que a função de transição retorne todos os possíveis estados que ele pode tomar em forma de novos objetos. traduzindo isso em python:
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #3a81c3; font-weight: bold;">class</span> <span style="color: #ba2f59; font-weight: bold;">Automato</span>:
+
+    <span style="color: #3a81c3;">(</span>...<span style="color: #3a81c3;">)</span>
+
+    <span style="color: #3a81c3; font-weight: bold;">def</span> <span style="color: #6c3163; font-weight: bold;">funcao_de_transicao</span><span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">self</span><span style="color: #3a81c3;">)</span> -&gt; <span style="color: #3a81c3;">list</span><span style="color: #3a81c3;">[</span>Automato<span style="color: #3a81c3;">]</span>:
+        topo_da_pilha = <span style="color: #3a81c3; font-weight: bold;">self</span>.pilha<span style="color: #3a81c3;">[</span>0<span style="color: #3a81c3;">]</span> <span style="color: #3a81c3; font-weight: bold;">if</span> <span style="color: #3a81c3;">len</span><span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">self</span>.pilha<span style="color: #3a81c3;">)</span> &gt; 0 <span style="color: #3a81c3; font-weight: bold;">else</span> <span style="color: #4e3163;">None</span>
+        <span style="color: #3a81c3; font-weight: bold;">if</span> topo_da_pilha <span style="color: #3a81c3; font-weight: bold;">in</span> <span style="color: #3a81c3; font-weight: bold;">self</span>.regras:
+            <span style="color: #3a81c3; font-weight: bold;">return</span> <span style="color: #3a81c3;">[</span>
+                Automato<span style="color: #6c3163;">(</span><span style="color: #3a81c3; font-weight: bold;">self</span>.input_string, transicao + <span style="color: #3a81c3; font-weight: bold;">self</span>.pilha<span style="color: #2d9574;">[</span>1:<span style="color: #2d9574;">]</span>, <span style="color: #3a81c3; font-weight: bold;">self</span>.regras<span style="color: #6c3163;">)</span>
+                <span style="color: #3a81c3; font-weight: bold;">for</span> transicao <span style="color: #3a81c3; font-weight: bold;">in</span> <span style="color: #3a81c3; font-weight: bold;">self</span>.regras<span style="color: #6c3163;">[</span>topo_da_pilha<span style="color: #6c3163;">]</span>
+            <span style="color: #3a81c3;">]</span>
+        <span style="color: #3a81c3; font-weight: bold;">elif</span> topo_da_pilha == <span style="color: #3a81c3; font-weight: bold;">self</span>.input_string<span style="color: #3a81c3;">[</span>0<span style="color: #3a81c3;">]</span>:
+            <span style="color: #3a81c3; font-weight: bold;">return</span> <span style="color: #3a81c3;">[</span>
+                Automato<span style="color: #6c3163;">(</span><span style="color: #3a81c3; font-weight: bold;">self</span>.input_string<span style="color: #2d9574;">[</span>1:<span style="color: #2d9574;">]</span>, <span style="color: #3a81c3; font-weight: bold;">self</span>.pilha<span style="color: #2d9574;">[</span>1:<span style="color: #2d9574;">]</span>, <span style="color: #3a81c3; font-weight: bold;">self</span>.regras<span style="color: #6c3163;">)</span>
+            <span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+ou seja, colocamos os novos símbolos da lista no topo (considerando que o topo seja o índex 0) fazendo <code>transicoes + self.pilha[1:]</code> (o que já retira o símbolo que está sendo trocado), e retornamos o objeto resultante para cada possível transição descrita nas regras.
+</p>
+
+<p>
+por fim, podemos criar uma função do automato que nos diz se ele aceitou o input ou não:
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #3a81c3; font-weight: bold;">class</span> <span style="color: #ba2f59; font-weight: bold;">Automato</span>:
+
+    <span style="color: #3a81c3;">(</span>...<span style="color: #3a81c3;">)</span>
+
+    <span style="color: #3a81c3; font-weight: bold;">def</span> <span style="color: #6c3163; font-weight: bold;">palavra_aceita</span><span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">self</span><span style="color: #3a81c3;">)</span>:
+        <span style="color: #3a81c3; font-weight: bold;">return</span> <span style="color: #3a81c3;">len</span><span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">self</span>.input_string<span style="color: #3a81c3;">)</span> == <span style="color: #3a81c3;">len</span><span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">self</span>.pilha<span style="color: #3a81c3;">)</span> == 0
+</pre>
+</div>
+<p>
+lembrando que não precisamos checar o estado porque pela construção já será final.
+</p>
+
+<p>
+para emular a derivação de uma palavra podemos então utilizar um algoritmo de busca em largura (<i>breadth first search</i>), isto é, começamos com o autômato inicial (que já possui \(S\) em sua pilha) e calculamos todas as possíveis transições até que uma delas aceite a palavra.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #3a81c3; font-weight: bold;">def</span> <span style="color: #6c3163; font-weight: bold;">simular_automato</span><span style="color: #3a81c3;">(</span><span style="color: #715ab1;">input_string</span>: <span style="color: #3a81c3;">str</span>, regras: <span style="color: #3a81c3;">dict</span><span style="color: #6c3163;">[</span><span style="color: #3a81c3;">str</span>, <span style="color: #3a81c3;">list</span><span style="color: #2d9574;">[</span><span style="color: #3a81c3;">str</span><span style="color: #2d9574;">]</span><span style="color: #6c3163;">]</span><span style="color: #3a81c3;">)</span>:
+    automato_inicial = Automato<span style="color: #3a81c3;">(</span>input_string, <span style="color: #2d9574;">"S"</span>, regras<span style="color: #3a81c3;">)</span>
+    <span style="color: #715ab1;">lista_de_automatos</span> = <span style="color: #3a81c3;">[</span>automato_inicial<span style="color: #3a81c3;">]</span>
+    <span style="color: #715ab1;">automatos</span> = <span style="color: #3a81c3;">{</span>0: lista_de_automatos<span style="color: #3a81c3;">}</span>
+    <span style="color: #715ab1;">i</span> = 0
+    <span style="color: #3a81c3; font-weight: bold;">while</span> <span style="color: #3a81c3; font-weight: bold;">not</span> <span style="color: #3a81c3;">any</span><span style="color: #3a81c3;">(</span>automato.palavra_aceita<span style="color: #6c3163;">()</span> <span style="color: #3a81c3; font-weight: bold;">for</span> automato <span style="color: #3a81c3; font-weight: bold;">in</span> lista_de_automatos<span style="color: #3a81c3;">)</span>:
+        <span style="color: #715ab1;">lista_de_automatos</span> = <span style="color: #3a81c3;">[]</span>
+        <span style="color: #3a81c3; font-weight: bold;">for</span> aut <span style="color: #3a81c3; font-weight: bold;">in</span> <span style="color: #715ab1;">automatos</span><span style="color: #3a81c3;">[</span>i<span style="color: #3a81c3;">]</span>:
+            <span style="color: #3a81c3; font-weight: bold;">if</span> transicoes := aut.funcao_de_transicao<span style="color: #3a81c3;">()</span>:
+                lista_de_automatos.extend<span style="color: #3a81c3;">(</span>transicoes<span style="color: #3a81c3;">)</span>
+        <span style="color: #3a81c3; font-weight: bold;">if</span> lista_de_automatos <span style="color: #3a81c3; font-weight: bold;">is</span> <span style="color: #4e3163;">None</span>:
+            <span style="color: #3a81c3; font-weight: bold;">break</span>
+        i += 1
+        automatos.update<span style="color: #3a81c3;">(</span><span style="color: #6c3163;">{</span>i: lista_de_automatos<span style="color: #6c3163;">}</span><span style="color: #3a81c3;">)</span>
+    <span style="color: #3a81c3; font-weight: bold;">if</span> <span style="color: #3a81c3;">len</span><span style="color: #3a81c3;">(</span>lista_de_automatos<span style="color: #3a81c3;">)</span> &gt; 0:
+        <span style="color: #3a81c3;">print</span><span style="color: #3a81c3;">(</span>f<span style="color: #2d9574;">"A palavra </span>{input_string}<span style="color: #2d9574;"> est&#225; na gram&#225;tica"</span><span style="color: #3a81c3;">)</span>
+    <span style="color: #3a81c3; font-weight: bold;">else</span>:
+        <span style="color: #3a81c3;">print</span><span style="color: #3a81c3;">(</span>f<span style="color: #2d9574;">"A palavra </span>{input_string}<span style="color: #2d9574;"> n&#227;o est&#225; na gram&#225;tica"</span><span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+basicamente, criamos um dicionário <code>automatos</code> que guarda cada geração da iteração e, para cada possível estado dessa geração, calculamos todos os estados que podemos chegar, e colocamos ele na próxima geração.
+</p>
+
+<p>
+quando qualquer um desses autômatos aceitar a palavra (tanto a <code>input_string</code> quanto a pilha estão vazias), podemos quebrar o loop e ter certeza que ela foi aceita. exemplificando, se rodarmos:
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #715ab1;">regras</span> = <span style="color: #3a81c3;">{</span><span style="color: #2d9574;">"S"</span>:<span style="color: #6c3163;">[</span><span style="color: #2d9574;">"E"</span><span style="color: #6c3163;">]</span>, <span style="color: #2d9574;">"E"</span> : <span style="color: #6c3163;">[</span><span style="color: #2d9574;">"E+T"</span>, <span style="color: #2d9574;">"T"</span><span style="color: #6c3163;">]</span>, <span style="color: #2d9574;">"T"</span>: <span style="color: #6c3163;">[</span><span style="color: #2d9574;">"T*F"</span><span style="color: #6c3163;">]</span>, <span style="color: #2d9574;">"F"</span>:<span style="color: #6c3163;">[</span><span style="color: #2d9574;">"(E)"</span>, <span style="color: #2d9574;">"id"</span><span style="color: #6c3163;">]</span><span style="color: #3a81c3;">}</span>
+simular_automato<span style="color: #3a81c3;">(</span><span style="color: #2d9574;">"id+(id*id+id)"</span>,regras<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+vemos que ele corretamente printará <code>A palavra id+(id*id+id) está na gramática</code>.
+</p>
+
+<p>
+para achar a derivação exata (e montar por exemplo uma árvore sintática), precisaríamos adicionar alguma maneira de descobrir qual foi a derivação <i>anterior</i> a um estado. assim, uma solução seria utilizar a noção de árvores como estrutura de dados, isto é, cada autômato teria um <code>pai</code>, que representa o estado que o gerou, e o automato inicial poderia simplesmente ser iniciado com <code>pai = None</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org126a7fd" class="outline-2">
+<h2 id="org126a7fd"><span class="section-number-2">6.</span> os problemas</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+qualquer programador que se preze deve agora estar espumando de raiva com as linhas acima. sim. eu sei. infelizmente, se tentarmos rodar essa função em uma palavra que certamente não está na linguagem, na maior parte dos casos ele não irá terminar (e isso inclui a nossa linguagem de expressões matemáticas \(L(G_{exp})\)).
+</p>
+
+<p>
+a função não irá terminar pois existem linguagens infinitas que sempre podem gerar pelo menos um novo estado simplesmente por recursão. por exemplo, a regra \(E \rightarrow E + T\) permite que o automato crie uma cadeia infinita \(T + T + T \cdots\) e, por mais que a palavra não esteja na linguagem, o autômato não consegue ter certeza, através do que foi feito acima, que de alguma maneira mágica a expressão \(T + T + T \cdots\) não se tornará por exemplo \(id * + id\).
+</p>
+
+<p>
+uma possível solução seria contar o tamanho da pilha e comparar com o tamanho da palavra dada, entretanto ela também tem sérios problemas. primeiramente, existem as transições do tipo \(X \rightarrow \epsilon\), então não podemos simplesmente contar as variáveis. portanto, poderíamos contar apenas os símbolos terminais, mas cairíamos em outro problema: existem também transições do tipo \(X \rightarrow XY\), e isso geraria uma cadeia infinita de \(Y\)'s sem nenhum terminal, e não há nenhuma maneira clara de ter certeza se essa cadeia infinita de \(Y\)'s se torne depois alguma coisa, especialmente se existir a regra \(Y \rightarrow \epsilon\).
+</p>
+
+<p>
+para nossa gramática \(G_{exp}\), limitar a quantidade de computações pela quantidade de terminais é suficiente, mas, de modo geral, essa solução não funcionará pra todas as gramáticas livres de contexto. além disso, temos um inimigo ainda maior: a complexidade temporal.
+</p>
+
+<p>
+este algoritmo é terrivelmente ineficiente. devido à natureza explosiva do problema, a quantidade de estados necessários cresce exponencialmente. na verdade, não é difícil mostrar que a quantidade de possíveis árvores de <i>parsing</i> é proporcional aos números de Catalan, e se o nosso programa precisa checar caso por caso todas as possíveis a árvores, então uma palavra de tamanho \(n\) leva tempo proporcional à:
+\[
+C_n = \frac{(2n)!}{(n+1)! n!}
+\]
+antes que tentem testar, qualquer palavra com mais de 120 caracteres que seja dada como entrada para a função faz com que não só o meu computador trave mas também que o processo seja inevitavelmente terminado pelo sistema operacional.
+</p>
+
+<p>
+fazendo um rápido <i>benchmarking</i>, grafei o tempo levado para calcular baseado no input:
+</p>
+<p width="70%">
+<img src="computadores_gramaticas/plot_desastroso.png" alt="plot_desastroso.png" width="70%" />
+eu não sei vocês, mas os meus olhos doem só de ver isto.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6bd1d32" class="outline-2">
+<h2 id="org6bd1d32"><span class="section-number-2">7.</span> as soluções</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+primeiro algumas notas e considerações: diferentemente das linguagens regulares, nem todas as linguagens livres de contexto podem ser descritas sem ambiguidade. isso significa que as linguagens livres de contexto <i>não-ambíguas</i> são um subconjunto próprio de todas as linguagens livres de contexto. para elas, existem algoritmos que realizam o trabalho em tempo quadrático ou até linear (como por exemplo o algoritmo para analisar gramáticas \(LR(k)\) de Knuth<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>), mas muitas vezes eles exigem que a gramática esteja de uma certa forma (por exemplo, que ela não seja recursiva à direita, ou que ela não tenha produções nulas), e requerem muito trabalho para implementar corretamente. 
+</p>
+
+<p>
+esses algoritmos são extremamente úteis para compiladores analisarem eficientemente linguagens de programação, visto que as gramáticas dessas podem ser manualmente construidas de modo a facilitar a leitura (em seu artigo, Knuth chama essas linguagens especiais de <i>translatable from left to right</i>). entretanto, eles não são aplicáveis à qualquer gramática.
+</p>
+
+<p>
+a análise de gramáticas ambíguas está especialmente atrelada ao processamento de linguagens naturais, mais especificamente ao processamento de análise da estrutura sintática de frases. para essa tarefa, existem dois algoritmos tradicionais: o algoritmo CYK<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup> (desenvolvido independentemente e simultaneamente por 3 autores distintos: Cocke, Younger e Kasami) e o algoritmo de Earley <sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>.
+</p>
+
+<p>
+o algoritmo de CYK é conhecido por ser um <i>bottom-up parser</i>, isto é, ele começa da string inicial e constrói todos os casos de baixo pra cima, até chegar na raiz da árvore, que no caso da gramática \(G_{exp}\) é o símbolo \(S\). para o algoritmo funcionar, entretanto, ele precisa que a gramática fornecida esteja na forma normal de <i>Chomsky</i>, que significa que a gramática só pode ter regras da forma:
+</p>
+\begin{align*}
+X &\rightarrow AB\\
+X &\rightarrow a
+\end{align*}
+<p>
+para variáveis \(X, A, B\) e terminal \(a\). é um resultado famoso que toda linguagem livre de contexto sem a palavra nula pode ser descrito por uma gramática nessa forma (e inclusive é dado um algoritmo para converter uma gramática arbitrária). ao invés de ser proporcional ao número de catalan, este algoritmo tem complexidade \(O(n^3)\), que é anos luz melhor do que o programa proposto inicialmente.
+</p>
+
+<p>
+entretanto, o <i>parser</i> inventado por Earley é muito mais interessante. não obstante ele aceitar as gramáticas em qualquer forma (isto é, não é necessário converter a gramática para a forma normal de <i>Chomsky</i>), ele tem no pior do pior dos casos uma complexidade \(O(n^3)\), e para certas gramáticas ele funciona melhor que o próprio algoritmo de CYK. de fato, para gramáticas não ambíguas, o algoritmo é, no pior dos casos, \(O(n^2)\), e, para gramáticas \(LR(k)\) (descritas por Knuth) ele termina em tempo linear \(O(n)\).
+</p>
+
+<p>
+de modo geral, a principal diferença entre a abordagem anterior e a proposta por Earley é a de restringir de maneira inteligente quais transições podem ser executadas a cada momento. para isso, ao invés de executar uma transição de cada vez, ele passa a executar todas as possíveis transições que não geram terminais em um único estado, e divide os conjuntos por caracter. isto é, o algoritmo começa analisando todos os estados que podem ser gerados a partir do símbolo inicial da gramática, e só passa para o próximo caracter quando todos os possíveis estados que geram o caracter inicial foram achados.
+</p>
+
+<p>
+para resolver o problema das recursões pela direita ou pela esquerda, o algoritmo simplesmente proibe que existam estados iguais dentro do conjunto de estados de um caracter. dessa forma, quando uma regra do tipo \(S \rightarrow SX\) é aplicada, ele percebe que o mesmo estado seria adicionado mais de uma vez e diretamente interrompe o loop infinito. dessa forma, é muito mais belo que o algoritmo de \(CYK\) e tão eficiente quanto, talvez até melhor.
+</p>
+
+<p>
+como este post já está enorme, darei mais detalhes no próximo post, sobre as especificidades e implementações de um Earley <i>parser</i>.
+</p>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Donald E. Knuth. On the Translation of Languages from Left to Right, <a href="https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.8867&amp;rep=rep1&amp;type=pdf">https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.8867&amp;rep=rep1&amp;type=pdf</a></p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Daniel H. Younger. Recognition and Parsing of Context-Free Languages in Time n<sup>3*</sup>. <a href="https://core.ac.uk/download/pdf/82305262.pdf">https://core.ac.uk/download/pdf/82305262.pdf</a></p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Jay Earley. An Efficient context-Free Parsing Algorithm. <a href="https://lara.epfl.ch/w/_media/compilation/p94-earley.pdf">https://lara.epfl.ch/w/_media/compilation/p94-earley.pdf</a></p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="date">Date: Sep 21, 2021-001632193200</p>
+<p class="author">Author: @o-santi</p>
+<p class="date">Created: Aug  9, 2022-001660069197</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

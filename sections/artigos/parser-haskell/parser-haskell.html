@@ -1,0 +1,892 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- Aug  9, 2022-001660068110 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>parser combinators em haskell</title>
+<meta name="author" content="@o-santi" />
+<meta name="description" content="como são escritos parsers desde que criamos vergonha na cara" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+</style>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">parser combinators em haskell</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org8ba7670">1. haskell</a></li>
+<li><a href="#orgf896fb3">2. programação funcional</a></li>
+<li><a href="#orgfc9ea51">3. tipos</a></li>
+<li><a href="#org037633b">4. pequenos blocos</a></li>
+<li><a href="#org395bc4f">5. combinando</a></li>
+<li><a href="#org5cc5595">6. mais combinações</a></li>
+<li><a href="#orgddf26e5">7. magia (mônades)</a></li>
+<li><a href="#org7e07095">8. expressões matemáticas</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org8ba7670" class="outline-2">
+<h2 id="org8ba7670"><span class="section-number-2">1.</span> haskell</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+tudo bem. implementamos em c++ um parser porco. ele funciona? sim. mas é muito chato adicionar novas operações, em especial porque ele implementa várias coisas em lugares separados; como por exemplo a prioridade da operação (no parsing) e a ação que é executada para a ação (no push). vimos também que, por ser em c++, precisamos implementar certos hacks para que funcione (como por exemplo usando switch para os casos que queremos que \(\varepsilon\) seja aceito).
+</p>
+
+<p>
+além disso, também vimos o problema de que o parser só aceita linguagens não ambíguas e não recursivas à esquerda (uma classe chamada de \(LL(k)\)), e por mais que eu não pretenda provar isso, é fato consumado que essa classe é estritamente menor que a classe de linguagens livres de contexto, que por sua vez é estritamente menor que a classe de linguagens sensíveis ao contexto. e nós temos exemplos de linguagens de programação que não são livres de contexto, como <a href="https://groups.google.com/g/comp.theory/c/uWk4sM9h3Mo?pli=1">xml</a>.
+</p>
+
+<p>
+assim, seria conveniente se conseguíssimos construir um parser que não apenas é mais potente (consegue processar uma classe maior de linguagens) como também é mais simples e intuitivo de se trabalhar. e sim, como você leu no título, podemos utilizar haskell para tal tarefa.
+</p>
+
+<p>
+não precisa falar, sim, eu sei, para a maior parte dos programadores que trabalham na mentalidade CPJR (C/Python/Java/Ruby (sim eu acabei de inventar esse acrônimo)), haskell é mais uma das linguagens estranhas que tem apenas o propósito de ser "diferente" na hora de programar. enquanto esse pode de fato ser o caso para a psique do programador médio (alienado), essa linguagem realmente apresenta inúmeras vantagens e facilidades para implementar o que queremos: <a href="https://en.wikipedia.org/wiki/Parser_combinator">parser combinators</a>!
+</p>
+
+<p>
+mas&#x2026;&#x2026;. o que são parser combinators? e por que haskell? por que não podemos fazer em C? e o que são essas "mônades" que o artigo da wikipedia fala? muitas perguntas sem nenhuma resposta&#x2026;
+</p>
+
+<p>
+brincadeira. eu tenho as respostas. ou pelo menos algumas. a ideia de combinação é quebrar o problema de construir um grande parser em implementar vários pequenos (e mais simples) parsers, que posteriormente serão compostos juntos de tal maneira a processar o que queríamos. utilizamos haskell ao invés de C pois os tipos das variáveis tomarão papel essencial no programa (e o type checker de C é pífio), isto é, veremos que o tipo dos Parsers é bem <i>interessante</i>. quanto às mônades, responder essa pergunta completamente é empreitada pretenciosa demais para este artigo, mas pretendo introduzir o conceito com alguns exemplos.
+</p>
+
+<p>
+antes de entrar nas especificações, vale notar que existem inúmeras bibliotecas em haskell que implementam (muito melhor que eu) o que irei fazer aqui. de fato, a maior parte deste código será puramente para explicar o que é <i>monadic parser combinators</i> e a teoria por trás, e eu prometo que o excerto que realmente implementa o parser que queremos não terá mais de 20 linhas.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf896fb3" class="outline-2">
+<h2 id="orgf896fb3"><span class="section-number-2">2.</span> programação funcional</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+em haskell nossa principal arma são funções e composição de funções, em especial aquelas que não mudam o estado do mundo fora dela. mas o que isso significa?
+</p>
+
+<p>
+vejamos o seguinte código em C:
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #715ab1;">foo</span> = 3;
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">bar</span><span style="color: #3a81c3;">(){</span>
+  foo++;
+  bla <span style="color: #ba2f59; font-weight: bold;">bla</span> <span style="color: #715ab1;">bla</span>...
+<span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+<p>
+imagine que precisamos executar a função <code>bar</code> em diversos lugares do programa; se analisarmos o estado qualquer parte da execução do programa e perguntarmos: qual o valor em <code>foo</code>? não é uma resposta óbvia, especialmente quando o programa é marginalmente complexo, visto que precisamos analisar todas as vezes que <code>bar</code> é chamada no programa, bem como todos os possíveis lugares que assinalamos outro valor à variável.
+</p>
+
+<p>
+para contornar esse problema, podemos exigir que todas as funções sejam puras; isto é, nenhuma função pode alterar o valor de uma variável que está fora do escopo dessa. isso gera impecílhos, já que no nivel do sistema operacional o <i>stdout</i> (onde geralmente printamos as coisas) também é apenas um arquivo, o que significa que não podemos facilmente escrever coisas na tela.
+</p>
+
+<p>
+esse estilo de programação é chamado de <b>programação funcional</b> e possui inúmeras vantagens à programação imperativa, principalmente o fato de que sempre sabemos à todo momento o estado das variáveis do nosso programa, bem como ser muito mais fácil de executar concorrentemente o programa (já que não temos <i>shared state</i>). por outro lado, existem inúmeros casos onde precisamos explicitamente de estados (por exemplo quando escrevemos algo na saída), e neles também utilizaremos estados, mas de uma maneira controlada e explicita: principalmente, utilizaremos <b>mônades</b> para isso. não pretendo me aprofundar muito sobre esse assunto, mas para os interessados: <a href="https://www.youtube.com/watch?v=fCoQb-zqYDI">What is IO monad?</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfc9ea51" class="outline-2">
+<h2 id="orgfc9ea51"><span class="section-number-2">3.</span> tipos</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+estaremos utilizando o <a href="https://www.haskell.org/ghc/">ghc</a> (Glasgow Haskell Compiler) para compilar e dar typecheck no programa, então se quiser executar junto, procure antes instalar o ghc. 
+</p>
+
+<p>
+podemos começar o nosso programa em haskell da seguinte forma
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">module</span> <span style="color: #ba2f59; font-weight: bold;">Main</span> <span style="color: #3a81c3; font-weight: bold;">where</span>
+
+<span style="color: #6c3163; font-weight: bold;">main</span> <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">IO</span><span style="color: #3a81c3; font-weight: bold;">()</span>
+<span style="color: #6c3163; font-weight: bold;">main</span> <span style="color: #715ab1;">=</span> undefined
+</pre>
+</div>
+<p>
+isso nos diz o seguinte: definimos um módulo chamado <code>Main</code> e definimos o seu <i>entrypoint</i> <code>main</code>, que é do tipo <code>IO</code> (input/output), o que significa que ele simplesmente irá escrever algo na tela, ou ler algo de algum arquivo. dizemos que <code>main = undefined</code> simplesmente para que o compilador não reclame, para poder definir outras coisas antes de definir a <code>main</code>. mas que outras coisas queremos definir? o parser!.
+</p>
+
+<p>
+afinal, o que é um parser? idealmente, pensando na definição que demos inicialmente, poderiamos considerar que é uma função que recebe uma string (a expressão) e retorna um número inteiro (que representa o resultado da computação). poderíamos definir algo do tipo:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">type</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">String</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #ba2f59; font-weight: bold;">Integer</span>
+</pre>
+</div>
+<p>
+essa notação de seta <code>a -&gt; b</code> indica o tipo de uma função que recebe um argumento do tipo <code>a</code> e retorna um valor do tipo <code>b</code>.
+</p>
+
+<p>
+essa definição pode ser estendida de algumas maneiras. primeiramente, para podermos combinar os parsers, podemos adicionar o resto da string que não fora processada como parte do output, para que o próximo parser possa usá-la como input:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">type</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">String</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">Integer</span>, <span style="color: #ba2f59; font-weight: bold;">String</span><span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+além disso, não há necessidade que todos os parsers sejam especificamente de expressões matemáticas. eles podem retornar inúmeros (ahá!) tipos. haskell nos permite construir esse tipo de tal forma que dependa em outro tipo fornecido:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">type</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> a <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">String</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">(</span>a, <span style="color: #ba2f59; font-weight: bold;">String</span><span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+ou seja, se criarmos um <code>Parser String</code>, teremos um parser que nos devolve String, se criarmos um <code>Parser Integer</code>, teremos um parser que devolve um inteiro. é importante perceber que <code>Parser</code> deixa de ser um tipo único e passa a ser uma família de tipos, visto que é uma função que recebe um argumento <code>a</code> e retorna um tipo (que também é uma função) associado a esse <code>a</code>.
+</p>
+
+<p>
+note também que em haskell para aplicar uma função em um argumento (neste caso estamos aplicando <code>String</code> à função <code>Parser</code>) basta concatená-las (escrever uma seguida da outra): ao invés de escrevermos <code>f(a)</code>, escrevemos <code>f a</code>.
+</p>
+
+<p>
+além disso, todas as funções são automaticamente <a href="https://en.wikipedia.org/wiki/Currying"><i>curried</i></a>, ou seja, se queremos que a função <code>f</code> receba mais de um argumento, ao invés de utilizarmos:
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #3a81c3; font-weight: bold;">def</span> <span style="color: #6c3163; font-weight: bold;">f</span><span style="color: #3a81c3;">(</span>a, b<span style="color: #3a81c3;">)</span>:
+    <span style="color: #3a81c3; font-weight: bold;">return</span> a + b
+</pre>
+</div>
+<p>
+usamos:
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #3a81c3; font-weight: bold;">def</span> <span style="color: #6c3163; font-weight: bold;">f</span><span style="color: #3a81c3;">(</span>a<span style="color: #3a81c3;">)</span>:
+    <span style="color: #3a81c3; font-weight: bold;">def</span> <span style="color: #6c3163; font-weight: bold;">h</span><span style="color: #3a81c3;">(</span>b<span style="color: #3a81c3;">)</span>:
+        <span style="color: #3a81c3; font-weight: bold;">return</span> a + b
+    <span style="color: #3a81c3; font-weight: bold;">return</span> h
+</pre>
+</div>
+<p>
+ou seja, o tipo de <code>f</code> é <code>Integer -&gt; Integer -&gt; Integer</code>. além de nos fornecer uma certa normalização (todas as funções sempre recebem apenas um argumento e retornam um argumento), nos permitem utilizar a concatenação: ao invés de <code>f(a, b)</code>, escrevemos <code>f a b</code>. explicitando, quando escrevemos <code>f a b</code>, primeiro aplicamos <code>(f a) b</code>, que nos dá <code>h b</code>, que pode por fim ser transformado na soma.
+</p>
+
+<p>
+continuando sobre o parser, ainda podemos fazer uma última modificação. sabemos que ele pode falhar, e podemos representar isso no tipo. existem diversas formas de implementar isso (por exemplo com a mônade <code>Maybe</code>), mas escolhi a mais simples que é retornar uma lista de possíveis resultados:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">type</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> a <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">String</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>a, <span style="color: #ba2f59; font-weight: bold;">String</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+e a lista vazia <code>[]</code> representa o caso onde a expressão não pode ser processada pelo parser. poderíamos estender ainda mais esse tipo, por exemplo retornando junto a posição na string onde o erro foi encontrado (o número do índice), uma segunda String que representa a mensagem do erro, dentre muitas outras coisas. por agora, esse tipo será suficiente para o que queremos.
+</p>
+
+<p>
+por fim, antes de continuar, utilizamos um pouco de magia de haskell. ao invés de simplesmente definir o tipo <code>Parser</code>, faremos o seguinte:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">newtype</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> a <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span>
+  <span style="color: #3a81c3;">{</span> runParser <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">String</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #6c3163;">[</span><span style="color: #2d9574;">(</span>a, <span style="color: #ba2f59; font-weight: bold;">String</span><span style="color: #2d9574;">)</span><span style="color: #6c3163;">]</span> <span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+<p>
+o que significa: além de definir o tipo <code>Parser</code>, definimos também uma função, chamada <code>runParser</code>, que automaticamente "desconstroi" o nosso tipo. essa função terá tipo <code>Parser a -&gt; String -&gt; [(a, String)]</code>, ou seja, ela recebe o nosso parser, e a string, e automaticamente <b>executa</b> ele. sim, parece magia, mas a função é automaticamente criada pelo compilador, então não precisaremos nos preocupar com isso. para entender mais sobre essa funcionalidade, leia a <a href="https://wiki.haskell.org/Newtype">wiki de haskell</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org037633b" class="outline-2">
+<h2 id="org037633b"><span class="section-number-2">4.</span> pequenos blocos</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+tudo bem. falamos muito de tipos. e quase nada de implementações. eu prometi que seria mais fácil. e será! vamos começar construindo uma função <code>charParser</code> que recebe um caracter e retorna um parser que processa <b>apenas</b> esse caracter. podemos implementá-la da seguinte forma:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">charParser</span> <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">Char</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #ba2f59; font-weight: bold;">Char</span>
+<span style="color: #6c3163; font-weight: bold;">charParser</span> x <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> f
+  <span style="color: #3a81c3; font-weight: bold;">where</span> f <span style="color: #3a81c3;">(</span>head<span style="color: #ba2f59; font-weight: bold;">:</span>tail<span style="color: #3a81c3;">)</span>
+          <span style="color: #715ab1;">|</span> head <span style="color: #715ab1;">==</span> x    <span style="color: #715ab1;">=</span> <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>head, tail<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+          <span style="color: #715ab1;">|</span> otherwise <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+        f <span style="color: #3a81c3; font-weight: bold;">[]</span>          <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+</pre>
+</div>
+<p>
+vamos analisar o código acima com calma. primeiro vemos a definição do tipo: nossa função recebe um caracter e retorna o parser desse caracter. se expandirmos <code>Parser Char</code>, vemos que é uma função do tipo <code>Char -&gt; String -&gt; [(Char, String)]</code>, o que é condizente com o que foi definido antes.
+</p>
+
+<p>
+depois, vamos para a especificação. dizemos que <code>charParser</code> recebe um argumento, <code>x</code>, e retorna um parser aplicado à uma função <code>f</code> (o sinal $ é o de concatenação a direita). o compilador é capaz de inferir que essa função deve receber uma <code>String</code> e retornar o tipo <code>[(Char, String)]</code>. ele nos permite portanto, na hora de especificar a função <code>f</code>, analisar os casos dessa string (utilizando a notação <code>where</code>).
+</p>
+
+<p>
+sabemos que uma <code>String</code> é uma lista de caractéres, e em haskell todas as listas são implementadas no estilo <i>linked list</i>, isto é, possuem um elemento head e uma lista tail. é exatamente isso que utilizamos na função: separamos a nossa string implicitamente no primeiro caracter <code>head</code> e na lista restante de caracteres <code>tail</code> (ao dizer <code>f(head: tail)</code>), o que nos permite analisar os casos:
+</p>
+<ul class="org-ul">
+<li>quando <code>head</code> for igual a <code>x</code>, definimos que a função deve retornar <code>[(head, tail)]</code>, ou seja, retornamos o próprio caracter processado e o resto da string, como havíamos prometido.</li>
+<li>caso contrário (<code>otherwise</code>), definimos que a função retorna a lista vazia.</li>
+</ul>
+
+<p>
+além disso, sabemos que a lista vazia não pode ser desconstruida em head e tail, e portanto colocamos esse último caso: se <code>f</code> receber a lista vazia (ou seja uma string vazia), ele também retornará a lista vazia, sinalizando que a expressão não pode ser processada.
+</p>
+
+<p>
+viu? é muito simples definir esse parser. apesar de a sintaxe de haskell não ser muito parecida com C e seus derivados, não doeu nada entender essas linhas. se tiver doido, leia até parar de doer, é importante, constrói caráter e desenvolve capacidade cognitiva.
+</p>
+
+<p>
+podemos visualizar esse parser em ação: criamos um parser <code>charParser 'h'</code> cujo único propósito neste mundo é testar se a primeira letra da string é o caracter 'h', não se propõe a nada mais, ou nada menos. mas como rodamos esse parser? isso mesmo: usando <code>runParser</code>! utilizando o <code>ghci</code> (o REPL do compilador de haskell), podemos carregar esse arquivo e rodar a linha
+</p>
+<div class="org-src-container">
+<pre class="src src-bash">*Main&gt; runParser <span style="color: #3a81c3;">(</span>charParser <span style="color: #2d9574;">'h'</span><span style="color: #3a81c3;">)</span> <span style="color: #2d9574;">"hello"</span>
+</pre>
+</div>
+<p>
+que nos dá o resultado <code>[('h', "ello"]</code>. uhul!! funcionou. ele realmente viu que a primeira letra da string era 'h', retirou essa letra da string e retornou o resto. rodando com uma string que não começa com 'h', por exemplo "world", ele corretamente nos devolve a lista vazia.
+</p>
+
+<p>
+tudo bem. implementamos um parser de uma letra. mas e agora? como eu uso ele pra ler uma string específica?
+</p>
+</div>
+</div>
+
+<div id="outline-container-org395bc4f" class="outline-2">
+<h2 id="org395bc4f"><span class="section-number-2">5.</span> combinando</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+já vimos anteriormente que uma String é simplesmente uma lista de caracteres, ou seja <code>[Char]</code>. utilizando a função <code>map</code> (que recebe uma função <code>f</code> e uma lista, e aplica <code>f</code> à cada elemento da lista), podemos aplicar a função <code>charParser</code> à uma string, e nos daria o tipo <code>[Parser Char]</code>, ou seja, uma lista de parsers de um caracter. porém, contudo, todavia, sabemos que na verdade um parser de string é do tipo <code>Parser [Char]</code>.
+</p>
+
+<p>
+precisamos então de uma função que receba <code>[Parser Char]</code> e nos devolva <code>Parser [Char]</code>. felizmente, inúmeros nerds inteligentes já pesquisaram programação (e teoria matemática também) o suficiente para implementar essa função para nós! de fato, na biblioteca padrão de haskell, temos uma função chamada <code>sequenceA</code>, que recebe <code>t (f a)</code> e nos devolve <code>f (t a)</code>!! isso é exatamente o que queremos, visto que precisamos transformar <code>List (Parser Char)</code> em <code>Parser (List Char)</code>.
+</p>
+
+<p>
+porém, temos alguns problemas: se tentarmos aplicar essa função diretamente, veremos que o compilador reclama que o tipo <code>Parser</code> não é <code>Applicative</code>. mas o que isso significa? 
+</p>
+
+<p>
+bom, a maneira que os nerds ancestrais implementaram essa função (e várias outras) foi super inteligente. ao invés de simplesmente nos dar a função e torcer para funcionar no tipo específico, eles fizeram da seguinte forma: para utilizar essa função, você precisa primeiro fornecer uma prova de que <code>f</code> é <code>Applicative</code> e <code>t</code> é <code>Traversable</code>. enquanto a biblioteca padrão de haskell já possui uma prova de que <code>List</code> (nosso <code>t</code>) é <code>Traversable</code>, nós não temos essa prova de que <code>Parser</code> é <code>Applicative</code>.
+</p>
+
+<p>
+mas o que significa provar isso? para provar que algo é <code>Applicative</code>, precisamos implementar duas funções especiais (chamadas <code>pure</code> e <code>&lt;*&gt;</code>), e também provar que esse mesmo algo é <code>Functor</code>. ok, nós prolongamos o problema, o que é um <code>Functor</code>?
+</p>
+
+<p>
+a interface <a href="https://en.wikipedia.org/wiki/Functor_(functional_programming)"><code>Functor</code></a> representa a classe de funções que são capazes de implementar a função <code>fmap</code>, isto é:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">class</span> <span style="color: #ba2f59; font-weight: bold;">Functor</span> f <span style="color: #3a81c3; font-weight: bold;">where</span>
+  fmap <span style="color: #715ab1;">::</span> <span style="color: #3a81c3;">(</span>a <span style="color: #715ab1;">-&gt;</span> b<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">-&gt;</span> f a <span style="color: #715ab1;">-&gt;</span> f b
+</pre>
+</div>
+<p>
+como assim? parece que esses nerds estão apenas complicando mais as coisas. imagine o seguinte cenário: eu te dou uma função <code>tradutor</code> que, dado um número inteiro, retorna uma string que representa esse número em português. então <code>tradutor 2</code> retorna a string <code>"dois"</code> e <code>tradutor 13</code> retorna a string <code>"treze"</code>. naturalmente, o tipo dessa função é <code>Integer -&gt; String</code>.
+</p>
+
+<p>
+utilizando <code>fmap</code>, podemos "penetrar" o nosso parser com essa função e aplicar diretamente ao resultado! isso significa que se eu te fornecer um <code>intParser</code> (um parser de inteiros), nós podemos traduzir os números que esse parser retorna simplesmente penetrando o resultado com <code>tradutor</code>. esse parser resultante leria por exemplo a string <code>"2"</code> e retornaria o resultado <code>[("dois", "")]</code>. informalmente, ele seria um <code>Parser (tradutor Integer)</code>, ou uma função que retorna <code>[tradutor(Integer), String]</code>.
+</p>
+
+<p>
+super interessante. mas como nós fazemos isso? basta&#x2026; pasme, implementar <code>fmap</code>!
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">instance</span> <span style="color: #ba2f59; font-weight: bold;">Functor</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #3a81c3; font-weight: bold;">where</span>
+  fmap f <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">Parser</span> p<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> g
+    <span style="color: #3a81c3; font-weight: bold;">where</span> g input <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">case</span> p input <span style="color: #3a81c3; font-weight: bold;">of</span>
+            <span style="color: #3a81c3; font-weight: bold;">[]</span>           <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+            <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>x, resto<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>f x, resto<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+vamos analisar o que acabamos de escrever: a função <code>fmap</code> recebe uma função e o parser que queremos "penetrar" a função em. sabemos que o segundo argumento é da forma <code>Parser p</code>, onde <code>p</code> é a nossa função <code>String -&gt; [(a, String)]</code>, então utilizamos pattern matching pra automaticamente ganhar acesso a essa função.
+</p>
+
+<p>
+depois, sabemos que o resultado deve ser do tipo <code>Parser g</code> onde <code>g</code> recebe uma string e transforma-a usando <code>p</code>. de novo, utilizamos pattern matching para pegar o input da função, e simplesmente aplicamos o parser ao input. sabemos que o resultado deve ser da forma <code>[(x, resto)]</code>, e é exatamente nesse <code>x</code> que queremos aplicar a função <code>f</code> (que passamos inicialmente). portanto, o que retornamos é a lista com a aplicação da função <code>f</code> em <code>x</code> e o resto do input a ser consumido. também precisamos inserir o caso em que <code>p</code> não processa o input, que deverá ser a lista vazia.
+</p>
+
+<p>
+pronto! provamos que o nosso tipo <code>Parser</code> na verdade é um <code>Functor</code>. agora podemos utilizar <code>fmap</code> junto do nosso parser.
+</p>
+
+<p>
+agora podemos provar que ele o tipo <code>Parser</code> também é um <code>Applicative</code>, implementando as duas outras funções: <code>pure</code> e <code>&lt;*&gt;</code>. primeiro observamos que o tipo de <code>pure</code> é <code>a -&gt; f a</code>. isso significa que, independente do input em <code>f</code>, ele deve sempre retornar <code>f a</code> (o elemento inicial que passamos). mas isso é muito fácil, basta implementar o seguinte parser:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">instance</span> <span style="color: #ba2f59; font-weight: bold;">Applicative</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #3a81c3; font-weight: bold;">where</span>
+  pure x <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> <span style="color: #715ab1;">\</span>input <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>x, input<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+  p1 <span style="color: #715ab1;">&lt;*&gt;</span> p2 <span style="color: #715ab1;">=</span> undefined
+</pre>
+</div>
+<p>
+ou seja, se chamarmos <code>pure 2</code>, receberemos um <code>Parser</code> que simplesmente ignora o input e retorna <code>[(2, input)]</code> (por isso o nome <i>pure</i>, ele não liga para o que passam como argumento, ele será um parser "constante"). a sintaxe <code>\a -&gt; b</code> representa uma função que recebe <code>a</code> e retorna <code>b</code>.
+</p>
+
+<p>
+para a segunda operação <code>&lt;*&gt;</code>, precisamos olhar analisar o tipo dela: <code>f(a -&gt;b) -&gt; f a -&gt; f b</code>. ok, o que isso significa? bom, se olharmos de perto, vemos que é bem parecido com o que implementamos em <code>fmap</code>, com a diferença de que a função inicial está "envolta" em <code>Parser</code> (<code>f (a-&gt;b)</code> ao invés de <code>(a -&gt;b)</code>). de fato, se imaginarmos que <code>fmap</code> faz a "penetração" incial da função, então o operador <code>&lt;*&gt;</code> "penetra" mais fundo, pegando 2 operadores que já estão envoltos e aplicando a função que queremos no que eles estão envolvendo.
+</p>
+
+<p>
+por exemplo, podemos somar o resultado de dois <code>Parser</code>'s sem ter que "desencapá-los" utilizando fmap junto da operação soma. se fizermos <code>fmap (+) pure 5 &lt;*&gt; pure 6</code>, o <code>fmap</code> fará a penetração inicial no primeiro parser, que será agora um parser do tipo <code>pure (+) 5</code>; isto é, o elemento que ele segura é a soma com o elemento 5 já aplicado, usando <i>currying</i>. ao usar o operador <code>&lt;*&gt;</code>, aplicamos a função <code>(+) 5</code> dentro do parser, no elemento <code>6</code>, e obtemos o resultado <code>pure 11</code>.
+</p>
+
+<p>
+a implementação disso é exatamente como descrito acima:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">instance</span> <span style="color: #ba2f59; font-weight: bold;">Applicative</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #3a81c3; font-weight: bold;">where</span>
+  pure x <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> <span style="color: #715ab1;">\</span>input <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>x, input<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+  <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">Parser</span> p1<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&lt;*&gt;</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">Parser</span> p2<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> <span style="color: #715ab1;">\</span>input <span style="color: #715ab1;">-&gt;</span>
+    <span style="color: #3a81c3; font-weight: bold;">case</span> p1 input <span style="color: #3a81c3; font-weight: bold;">of</span>
+      <span style="color: #3a81c3; font-weight: bold;">[]</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+      <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>g, resto<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3; font-weight: bold;">case</span> p2 resto <span style="color: #3a81c3; font-weight: bold;">of</span>
+                        <span style="color: #3a81c3; font-weight: bold;">[]</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+                        <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>a, resto'<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>g a, resto'<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+primeiro usamos pattern matching, nos dois <code>Parser</code>'s, depois aplicamos o primeiro ao input, pegamos a função <code>g</code> resultante, aplicamos o resto ao segundo parser, e retornamos a aplicação de <code>g</code> no que foi processado em <code>p2</code> junto do novo resto. precisamos também adicionar os casos em que os parsers falham, e nos dois simplesmente retornamos as listas vazias.
+</p>
+
+<p>
+tome um tempo para compreender o que acabamos de implementar; não é simples mas é bem poderoso. isso significa que podemos "injetar" (ou aplicar, dai o nome <code>Applicative</code>) qualquer função que quisermos dentro do resultado de um parser e aplicar subsequentemente outras funções, sem ter que explicitamente "desencapar" (<i>unwrap</i>) o nosso tipo. temos uma maneira clara de <b>combinar</b> dois parsers: através do operador <code>&lt;*&gt;</code> e <code>fmap</code>!  
+</p>
+
+<p>
+finalmente podemos implementar o parser de strings proposto inicialmente:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">stringParser</span> <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">String</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #ba2f59; font-weight: bold;">String</span>
+<span style="color: #6c3163; font-weight: bold;">stringParser</span> input <span style="color: #715ab1;">=</span> sequenceA <span style="color: #715ab1;">$</span> map charParser input
+</pre>
+</div>
+<p>
+que nos permite fazer:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">*Main&gt; runParser <span style="color: #3a81c3;">(</span>stringParser <span style="color: #2d9574;">"hello world"</span><span style="color: #3a81c3;">)</span> <span style="color: #2d9574;">"hello world blablabla"</span>
+<span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span><span style="color: #2d9574;">"hello world"</span>,<span style="color: #2d9574;">" blablabla"</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+<b>eureka</b>! o parser <code>stringParser "hello world"</code> procura especificamente pela string <code>"hello world"</code>, e qualquer outra coisa que ele ache no inicio fará com que ele retorne a lista vazia. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-org5cc5595" class="outline-2">
+<h2 id="org5cc5595"><span class="section-number-2">6.</span> mais combinações</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+tudo bem, nós sabemos como procurar por um caracter e por uma string, mas e se nós quiséssemos procurar por duas strings diferentes? por exemplo, poderíamos estar procurando por um <code>Bool</code>, que pode ser tanto a string "true" quanto a string "false".
+</p>
+
+<p>
+para fazer isso, precisamos de alguma maneira dizer para o parser "por favor (o por favor é muito importante), tente processar primeiro a string "true" e se não conseguir, processe a string "false"".
+</p>
+
+<p>
+novamente, os nerds ancestrais vêm ao resgate. podemos implementar outra interface em haskell chamada <code>Alternative</code>, que exige que a nossa função também seja <code>Applicative</code> (por isso provamos isso primeiro). essa interface implementa diversas funções que nós usaremos.
+</p>
+
+<p>
+a principal delas é o operador <code>&lt;|&gt;</code>, que pode ser interpretado como o "ou" lógico. para que ele funcione, precisamos implementar junto uma função chamada <code>empty</code>, que será exatamente o parser que sempre retorna vazio. o operador <code>&lt;|&gt;</code> nos permitirá então juntar diversos parsers e retornará o primeiro da lista que não tiver um resultado vazio. simples, não?
+</p>
+
+<p>
+basta então implementar as duas funções. primeiro precisamos importar a interface <code>Alternative</code>. depois, basta fazermos:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">import</span> <span style="color: #ba2f59; font-weight: bold;">Control.Applicative</span>
+
+<span style="color: #3a81c3; font-weight: bold;">instance</span> <span style="color: #ba2f59; font-weight: bold;">Alternative</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #3a81c3; font-weight: bold;">where</span>
+  empty <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> <span style="color: #715ab1;">\</span><span style="color: #3a81c3; font-weight: bold;">_</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+  <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">Parser</span> p1<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&lt;|&gt;</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">Parser</span> p2<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> f
+    <span style="color: #3a81c3; font-weight: bold;">where</span> f <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">case</span> p1 input <span style="color: #3a81c3; font-weight: bold;">of</span>
+            <span style="color: #3a81c3; font-weight: bold;">[]</span>           <span style="color: #715ab1;">-&gt;</span> p2 input
+            <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>x, resto<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>x, resto<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+o que acabamos de construir é muito simples, mas muito útil. a função <code>empty</code> é uma função que implementa o parser mais básico de todos: independente do input, ele sempre retorna a lista vazia. para implementar o "ou lógico" do nosso parser, simplesmente fazemos uma análise de casos: aplicamos o <code>input</code> a <code>p1</code>, se isso for vazio, devolvemos o resultado de <code>p2</code> (vazio ou não), e se o resultado for um parse bem sucedido, retornamos ele. fácil, não?
+</p>
+
+<p>
+com essa função, podemos implementar o nosso parser de <code>Bool</code> bem facilmente:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">boolParser</span> <span style="color: #715ab1;">=</span> stringParser <span style="color: #2d9574;">"true"</span> <span style="color: #715ab1;">&lt;|&gt;</span> stringParser <span style="color: #2d9574;">"false"</span>
+</pre>
+</div>
+<p>
+que é capaz de ler ambas as strings:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">*Main&gt; runParser boolParser <span style="color: #2d9574;">"true"</span>
+<span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span><span style="color: #2d9574;">"true"</span>,<span style="color: #2d9574;">""</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+*Main&gt; runParser boolParser <span style="color: #2d9574;">"false"</span>
+<span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span><span style="color: #2d9574;">"false"</span>,<span style="color: #2d9574;">""</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+e utilizando a penetração que implementamos anteriormente (<code>fmap</code>), podemos transformar automaticamente o que esse parser acha na representação de <code>True</code> e <code>False</code> nativos de haskell (fica de exercício para o leitor).
+</p>
+
+<p>
+uma função ainda mais importante que ganhamos acesso é <code>many</code>, que utiliza a noção de "vazio" para procurar dentro de uma lista o maior número possível de coisas em seguida não-vazias. podemos compará-la com a <a href="https://pt.wikipedia.org/wiki/Fecho_de_Kleene">estrela de kleene</a>, e podemos utilizar ela para implementar um parser que procura por classes de caracteres (por exemplo, dígitos, ou letras maiúsculas) em sequência. chamaremos essa função de <code>spanParser</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">spanParser</span> <span style="color: #715ab1;">::</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">Char</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #ba2f59; font-weight: bold;">Bool</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #ba2f59; font-weight: bold;">String</span>
+<span style="color: #6c3163; font-weight: bold;">spanParser</span> f <span style="color: #715ab1;">=</span> many <span style="color: #715ab1;">$</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> g
+  <span style="color: #3a81c3; font-weight: bold;">where</span> g <span style="color: #3a81c3;">(</span>head<span style="color: #ba2f59; font-weight: bold;">:</span> tail<span style="color: #3a81c3;">)</span>
+          <span style="color: #715ab1;">|</span> f head <span style="color: #715ab1;">==</span> <span style="color: #ba2f59; font-weight: bold;">True</span>  <span style="color: #715ab1;">=</span> <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>head, tail<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+          <span style="color: #715ab1;">|</span> f head <span style="color: #715ab1;">==</span> <span style="color: #ba2f59; font-weight: bold;">False</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+        g <span style="color: #3a81c3; font-weight: bold;">[]</span>                <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+</pre>
+</div>
+<p>
+é uma função simples. primeiro implementamos o parser, que utiliza a função predicativa (que diz <code>true</code> ou <code>false</code> para todo caracter) para comparar o primeiro caracter do input. se ele for verdadeiro, retornamos o resultado processado, se for falso retornamos a lista vazia. por fim, aplicamos <code>many</code> a esse parser.
+</p>
+
+<p>
+podemos então usar esse parser para implementar outro extremamente importante (e muitas vezes esquecido):
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">import</span> <span style="color: #ba2f59; font-weight: bold;">Data.Char</span> <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">isSpace est&#225; nesse m&#243;dulo</span>
+<span style="color: #6c3163; font-weight: bold;">whitespaceParser</span> <span style="color: #715ab1;">=</span> spanParser isSpace
+</pre>
+</div>
+<p>
+uma função que simplesmente consome os espaços vazios.
+</p>
+
+<p>
+e o parser mais essencial (que ainda não implementamos), o parser de números, pode ser implementado com a mesma ideia:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">intParser</span> <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #ba2f59; font-weight: bold;">Integer</span>
+<span style="color: #6c3163; font-weight: bold;">intParser</span> <span style="color: #715ab1;">=</span> read <span style="color: #715ab1;">&lt;$&gt;</span> spanParser isDigit <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">isDigit tamb&#233;m &#233; definida em Data.Char</span>
+</pre>
+</div>
+<p>
+penetramos esse parser com <code>read</code> para transformar os números de <code>String</code> para a representação nativa <code>Integer</code>. note que o operador <code>&lt;$&gt;</code> é simplesmente outro nome para a função <code>fmap</code>, mas ao invés de ser uma função prefix (vem antes dos argumentos), ele age infix (vem no meio dos argumentos).
+</p>
+
+<p>
+entretanto, temos um problema. assim como a estrela de kleene, a função <code>many</code> procura por zero ou mais objetos, e se não houver um número, ela irá retornar a string vazia processada (ao invés de retornar um erro), e quando passarmos essa string vazia, a função read levantará um erro, já que vazio não é um número.
+</p>
+
+<p>
+o que precisamos fazer então é uma função que quebra o parser se o nosso parser retornar uma lista vazia. chamaremos de <code>notNull</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">notNull</span> <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #3a81c3;">[</span>a<span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #3a81c3;">[</span>a<span style="color: #3a81c3;">]</span>
+<span style="color: #6c3163; font-weight: bold;">notNull</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">Parser</span> p<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> <span style="color: #715ab1;">\</span>input <span style="color: #715ab1;">-&gt;</span>
+  <span style="color: #3a81c3; font-weight: bold;">case</span> p input <span style="color: #3a81c3; font-weight: bold;">of</span>
+    <span style="color: #3a81c3; font-weight: bold;">[]</span>     <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+    <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>x, resto<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3; font-weight: bold;">case</span> x <span style="color: #3a81c3; font-weight: bold;">of</span> 
+                      <span style="color: #3a81c3; font-weight: bold;">[]</span>  <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+                      otherwise <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>x, resto<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+ele simplesmente aplica o parser dado na string de input, e só devolve <code>x</code> se ele não for a lista vazia.
+</p>
+
+<p>
+assim, implementamos <code>intParser</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">intParser</span> <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #ba2f59; font-weight: bold;">Integer</span>
+<span style="color: #6c3163; font-weight: bold;">intParser</span> <span style="color: #715ab1;">=</span> read <span style="color: #715ab1;">&lt;$&gt;</span> notNull <span style="color: #3a81c3;">(</span>spanParser isDigit<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+
+<p>
+ok. vimos isso tudo. mas ainda sim a sintaxe é um pouco complexa. <code>fmap</code>? <code>&lt;*&gt;</code>? e o que esse cifrão quer dizer? muitas funções não intuitivas e eu não sei exatamente como juntar todas elas, e ainda precisamos analisar os casos? as coisas estão ficando cada vez mais complexas&#x2026;
+</p>
+
+<p>
+não se preocupe, ainda temos um último truque na manga.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgddf26e5" class="outline-2">
+<h2 id="orgddf26e5"><span class="section-number-2">7.</span> magia (mônades)</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+inicialmente o conceito de mônades pode parecer um pouco mágico, mas a ideia é que elas nos fornecem uma interface para retirar e colocar novamente valores dentro de tipos. como assim?
+</p>
+
+<p>
+a principal força das mônades é uma operação chamada <code>bind</code>, em haskell denotada por:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3;">(</span><span style="color: #6c3163; font-weight: bold;">&gt;&gt;=</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">::</span> m a <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3;">(</span>a <span style="color: #715ab1;">-&gt;</span> m b<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">-&gt;</span> m b
+</pre>
+</div>
+<p>
+o ponto dessa função é a seguinte: ela recebe um valor envolto em uma mônade (<code>m a</code>), uma função que recebe esse valor e transforma em um novo valor envolto em uma mônade (<code>a -&gt; m b</code>) e nos devolve esse novo valor (<code>m b</code>). de uma certa forma, a operação <code>bind</code> empurra goela abaixo um valor envolto numa mônade em uma função que inicialmente não aceita valores envoltos em mônades.
+</p>
+
+<p>
+por exemplo, podemos utilizar <code>bind</code> para somar o resultado de dois <code>Parser</code>'s de números. a ideia é a seguinte: sabemos que a função que <code>bind</code> espera uma função que aceita um argumento e devolve um parser. portanto, nós podemos encadear os parsers usando funções lambdas; isto é: para cada parser, nós podemos guardar o valor dele num argumento que será passado para a próxima função que devolverá um novo parser. mais ou menos da seguinte forma:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">soma</span> <span style="color: #715ab1;">=</span> intParser <span style="color: #715ab1;">&gt;&gt;=</span> <span style="color: #715ab1;">\</span>x  <span style="color: #715ab1;">-&gt;</span>
+  <span style="color: #3a81c3;">(</span>charParser <span style="color: #2d9574;">'+'</span> <span style="color: #715ab1;">&gt;&gt;=</span> <span style="color: #715ab1;">\</span><span style="color: #3a81c3; font-weight: bold;">_</span> <span style="color: #715ab1;">-&gt;</span>
+      <span style="color: #6c3163;">(</span>intParser <span style="color: #715ab1;">&gt;&gt;=</span> <span style="color: #715ab1;">\</span>y  <span style="color: #715ab1;">-&gt;</span> return <span style="color: #2d9574;">(</span>x <span style="color: #715ab1;">+</span> y<span style="color: #2d9574;">)</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+ok, parece complexo mas é simples. o primeiro parser nos dá um <code>Parser Integer</code>. utilizando <code>bind</code>, nós passamos o inteiro que foi achado como argumento para a próxima função (e guardamos o valor em <code>x</code>). essa nova função le o caracter '+' e não passa nenhum argumento a frente (por isso o buraco <code>\_</code>, que significa que a função não passa nenhum argumento), já que só queremos que o caracter esteja lá, não precisamos de nenhum valor. por fim, pegamos outro inteiro, guardamos o valor lido em <code>y</code> e passamos para a função final.
+</p>
+
+<p>
+a função <code>return</code> é simplesmente outro nome para a função <code>pure</code> implementada anteriormente; isto é, ela nos dá um <code>Parser</code> que retornará o valor <code>x+y</code> independente da string que for passada. assim, a função toda nos dará outro <code>Parser</code>, tendo exatamente o tipo esperado pela mônade.
+</p>
+
+<p>
+ainda sim, essa sintaxe não é a ideal. muitas funções, muito parênteses, muitas coisas acontecendo na tela. felizmente, os nerds que inventaram haskell tiveram <i>yet another</i> ideia brilhante: <b>do notation</b>. o que é isso? é uma notação em haskell que é açúcar sintático (isto é, puramente frufru) que esconde todas as aplicações de <code>bind</code> e de funções lambdas, e <b>magicamente</b> conecta tudo. não acredita? vejam o código a seguir.
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">soma</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">do</span>
+  x <span style="color: #715ab1;">&lt;-</span> intParser
+  charParser <span style="color: #2d9574;">'+'</span>
+  y <span style="color: #715ab1;">&lt;-</span> intParser
+  return x<span style="color: #715ab1;">+</span>y
+</pre>
+</div>
+<p>
+viram? é só isso. nenhum operador <code>&gt;&gt;=</code>, nenhum parênteses, nenhuma função lambda, simplesmente guardamos valores e utilizamos eles depois, tal qual programação imperativa em C. guardamos o valor do primeiro parser em <code>x</code>, o valor do segundo parser em <code>y</code>, e retornamos <code>x+y</code>. internamente, cada linha do tipo <code>a &lt;- expressao</code> é transformada em uma chamada de função <code>expressao &gt;&gt;=\a -&gt;</code>, e cada linha que não guarda variável em uma chamada de função <code>expressao &gt;&gt;= \_ -&gt;</code>. por trás dos panos, esse código e o bloco anterior são compilados para exatamente a mesma coisa.
+</p>
+
+<p>
+se essa notação é tão boa? então porque nós simplesmente não usamos? bom, precisamos primeiro implementar a interface <code>Monad</code> para poder usá-la. e eu queria primeiro mostrar como funcionam as coisas mais simples antes de mostrar isso. para mostrar que <code>Parser</code> é uma <code>Monad</code>, basta implementar a função <code>&gt;&gt;=</code> (visto que já mostramos que é <code>Applicative</code>). mas isso é relativamente simples:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">instance</span> <span style="color: #ba2f59; font-weight: bold;">Monad</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #3a81c3; font-weight: bold;">where</span>
+  <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">Parser</span> p<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&gt;&gt;=</span> f <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">Parser</span> <span style="color: #715ab1;">$</span> <span style="color: #715ab1;">\</span>input <span style="color: #715ab1;">-&gt;</span>
+    <span style="color: #3a81c3; font-weight: bold;">case</span> p input <span style="color: #3a81c3; font-weight: bold;">of</span>
+      <span style="color: #3a81c3; font-weight: bold;">[]</span>   <span style="color: #715ab1;">-&gt;</span> <span style="color: #3a81c3; font-weight: bold;">[]</span>
+      <span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>a, resto<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">-&gt;</span> runParser <span style="color: #3a81c3;">(</span>f a<span style="color: #3a81c3;">)</span> resto
+</pre>
+</div>
+<p>
+pegamos o parser que foi passado à função e aplicamos ao input. se for vazio, retornamos vazio e acabamos com a operação, se não, aplicamos <code>f</code> a <code>a</code>, que nos dará um novo parser. utilizamos então esse novo parser para processar o resto do input.
+</p>
+
+<p>
+outra vantagem de utilizar a <b>do notation</b> é que não precisamos mais nos importar com o caso em que a lista é vazia: a operação <code>bind</code> automaticamente quebra toda a sequência e retorna vazio caso um dos parsers retorne vazio.
+</p>
+
+<p>
+podemos finalmente, com todos esses operadores implementados, criar a nossa gramática de expressões
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7e07095" class="outline-2">
+<h2 id="org7e07095"><span class="section-number-2">8.</span> expressões matemáticas</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+nosso parser de expressões, diferentemente do parser em c++, não tem problema com inicio comum (devido à <a href="https://wiki.haskell.org/Lazy_evaluation">lazy evaluation</a> em haskell). nossa gramática fica mais simples:
+</p>
+\begin{align*}
+expr &\rightarrow term + expr ~|~ term\\
+term &\rightarrow factor * term ~|~ factor\\
+factor &\rightarrow (expr) ~|~ int 
+\end{align*}
+<p>
+isso é implementado por: 
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">expr</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">do</span> x <span style="color: #715ab1;">&lt;-</span> term
+          charParser <span style="color: #2d9574;">'+'</span>
+          y <span style="color: #715ab1;">&lt;-</span> expr
+          return <span style="color: #3a81c3;">(</span>x<span style="color: #715ab1;">+</span>y<span style="color: #3a81c3;">)</span>
+        <span style="color: #715ab1;">&lt;|&gt;</span> term <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">note o uso do operador "ou"</span>
+<span style="color: #6c3163; font-weight: bold;">term</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">do</span> x <span style="color: #715ab1;">&lt;-</span> factor
+          charParser <span style="color: #2d9574;">'*'</span>
+          y <span style="color: #715ab1;">&lt;-</span> term
+          return <span style="color: #3a81c3;">(</span>x<span style="color: #715ab1;">*</span>y<span style="color: #3a81c3;">)</span>
+        <span style="color: #715ab1;">&lt;|&gt;</span> factor <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">e de novo</span>
+<span style="color: #6c3163; font-weight: bold;">factor</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">do</span> charParser <span style="color: #2d9574;">'('</span>
+            x <span style="color: #715ab1;">&lt;-</span> expr
+            charParser <span style="color: #2d9574;">')'</span>
+            return x
+          <span style="color: #715ab1;">&lt;|&gt;</span> intParser <span style="color: #2aa1ae; background-color: #ecf3ec;">-- </span><span style="color: #2aa1ae; background-color: #ecf3ec;">e de novo&#178;</span>
+</pre>
+</div>
+<p>
+é só isso. sem brincadeira. é só isso. leia e releia. esse é o parser inteiro. não precisamos de um lexer, não precisamos de quarenta funções, nem de <i>switch</i> cases nem da função <code>push</code> com inúmeros casos pra cada operador. vemos que adicionar outro operador (por exemplo, subtração ou divisão) torna-se adicionar duas ou três novas linhas em um desses parsers. além disso, pessoalmente acho isso muito mais legível do que um código em C.
+</p>
+
+<p>
+para fazer com que o nosso parser não ligue para espaços em branco, só precisamos adicionar o parser <code>whitespace</code> entre o parser dos operadores. todo o resto é feito magicamente. vejamos alguns exemplos:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">*Main&gt; runParser expr <span style="color: #2d9574;">"3+4*5"</span>
+<span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>23,<span style="color: #2d9574;">""</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+*Main&gt; runParser expr <span style="color: #2d9574;">"5 * (6 + 7) + 1"</span>
+<span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>66,<span style="color: #2d9574;">""</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+*Main&gt; runParser expr <span style="color: #2d9574;">"1 + 2 * 3"</span>
+<span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>7,<span style="color: #2d9574;">""</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+*Main&gt; runParser expr <span style="color: #2d9574;">"1 + 2 +* 3"</span> 
+<span style="color: #3a81c3;">[</span><span style="color: #6c3163;">(</span>3,<span style="color: #2d9574;">" +* 3"</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">]</span>
+</pre>
+</div>
+<p>
+note no último caso ele só conseguiu ler a primeira soma, e a segunda foi deixada não-processada, assim como esperado.
+</p>
+
+<p>
+de fato, implementar parsers <i>combinators</i> monádicos é, pelo menos pra mim, muito mais intuitivo e fácil do que utilizando outros tipos de parsers. existem inúmeras implementações de parsers monádicos em haskell, muito mais profissionais, corretas e seguras do que a minha, mas as ideias e os conceitos são exatamente os mesmos. por exemplo, uma das ferramentas mais famosas de conversão de arquivos (chamada <a href="https://pandoc.org/"><i>pandoc</i></a>) é implementada em haskell justamente por causa dos parsers combinators.
+</p>
+
+<p>
+talvez um dos principais motivos para usarmos <i>parser combinators</i> monádicos (necessariamente os monádicos) é que eles são capazes de processar gramáticas sensíveis ao contexto. se não utilizarmos as mônades, e ao invés disso combinarmos tudo a partir das ferramentas oferecidas pela interface <code>Applicative</code> (como <code>&lt;*&gt;</code> e <code>fmap</code>), então o parser resultante só é capaz de processar gramáticas livre de contexto. essa diferença se dá pois através das mônades (mais especificamente do <code>bind</code>), o parser é capaz de tomar decisões sobre qual parser ele deve rodar em seguida utilizando o valor lido anteriormente.
+</p>
+
+<p>
+tome tempo para entender tudo que foi dito aqui, pois é uma ferramenta extremamente poderosa (e é até hoje um assunto pesquisado), especialmente as noções mais avançadas de teoria dos tipos e de programação funcional.
+</p>
+
+<p>
+podemos por fim completar o nosso programa adicionando a função main
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #6c3163; font-weight: bold;">main</span> <span style="color: #715ab1;">::</span> <span style="color: #ba2f59; font-weight: bold;">IO</span><span style="color: #3a81c3; font-weight: bold;">()</span>
+<span style="color: #6c3163; font-weight: bold;">main</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3; font-weight: bold;">do</span> input <span style="color: #715ab1;">&lt;-</span> getLine
+          putStr <span style="color: #715ab1;">$</span> show <span style="color: #715ab1;">$</span> runParser expr input
+</pre>
+</div>
+<p>
+note novamente a do notation ao utilizarmos a mônade <code>IO</code>. o que ela quer dizer é simples, primeiro lemos uma linha diretamente do <i>stdin</i>. depois, passamos essa string para o parser, que irá retornar uma lista com os possíveis resultados (no nosso caso, como não é ambígua, será apenas um possível resultado), depois passamos para a função show, que transforma o resultado em uma string, e por fim escrevemos essa string no <i>stdout</i>.
+</p>
+
+<p>
+compilamos com <code>ghc Main.hs</code> e <i>voilà</i>, temos um executavel compilado (exatamente igual o do C) que é capaz de processar as expressões que queríamos. para ter acesso ao arquivo completo, clique <a href="file:///src/Main.hs">aqui</a> (ou procure no repositório do github deste site).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: Jan 21, 2022-001642734000</p>
+<p class="author">Author: @o-santi</p>
+<p class="date">Created: Aug  9, 2022-001660068110</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

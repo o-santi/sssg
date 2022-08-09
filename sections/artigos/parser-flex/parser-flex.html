@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- Aug  9, 2022-001660067135 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>expressões matemáticas em C++</title>
+<meta name="author" content="@o-santi" />
+<meta name="description" content="como escreviam parsers na idade das pedras" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+</style>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">expressões matemáticas em C++</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgf3d1ff8">1. o parser</a></li>
+<li><a href="#org8983f66">2. sobre a gramática</a></li>
+<li><a href="#orga18f712">3. implementação</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf3d1ff8" class="outline-2">
+<h2 id="orgf3d1ff8"><span class="section-number-2">1.</span> o parser</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+tempos atrás fiz um <a href="file:///posts/computadores_gramaticas/">post</a> sobre a implementação de uma calculadora de expressões matemáticas e terminei dizendo que voltaria com uma implementação. de fato eu esqueci disso durante muito tempo. mas eu lembrei hoje!
+</p>
+
+<p>
+e eu voltei com não apenas uma, mas DUAS implementações distintas. veremos primeiro a solução mais bruta e complexa, que foi "descoberta" (ou desenvolvida) primeiro nos primórdios da computação (por volta de 1960~1970), e depois veremos uma solução muito mais simples e elegante.
+</p>
+
+<p>
+o que irei apresentar será um <a href="https://en.wikipedia.org/wiki/Recursive_descent_parser"><i>Recursive Descent Parser</i></a> utilizando Flex e C++. o programa Flex não é realmente necessário, mas ele oferece uma sintaxe fácil e concisa para implementar um <b>lexer</b>, que transformará o input do programa em <i>tokens</i> e facilitará as coisas na hora de executar o parsing. utilizamos C++ pura e simplesmente para poder utilizar o tipo <code>string</code> sem tem que mexer com ponteiros. não utilizaremos nenhuma classe (yuck) nem nada do gênero. 
+</p>
+
+<p>
+a ideia principal desse tipo de parser é transformar cada símbolo não-terminal em uma função que chama (executa) os símbolos à direita da regra, e transformar os símbolos terminais em funções que comparam o input atual e dizem se é ou não igual ao que era esperado.
+</p>
+
+<p>
+entretanto, não é suficiente simplesmente utilizar essa forma de parsing para calcular, já que iremos apenas gerar uma árvore sintática. para de fato calcular o valor da expressão, iremos também implementar um interpretador de pilha, que irá utilizar a ordem que os elementos são colocados na pilha para executar as operações.
+</p>
+
+<p>
+felizmente, podemos utilizar o nosso parser para inserir os elementos na ordem correta. de fato, a função do nosso parser neste programa é de transformar os elementos na notação comum ou padrão, que nós humanos gostamos e entendemos, para a notação que o interpretador de pilha gosta e entende, chamada de <a href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">notação polonesa reversa</a>. o nome parece complicado, mas é uma maneira simples de representar sem ambiguidade a ordem das operações <b>sem precisar utilizar parênteses</b>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org8983f66" class="outline-2">
+<h2 id="org8983f66"><span class="section-number-2">2.</span> sobre a gramática</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+infelizmente esse tipo de parser é um pouco fresco para com as gramáticas. primeiramente, a gramática que ele aceita não pode ser ambígua (ou seja, mais de uma possível derivação para a expressão). felizmente, vimos no post inicial que podemos transformar a gramática simples (e ambígua) de expressões matemáticas em uma gramática não ambígua adicionando novas regras.
+</p>
+
+<p>
+entretanto, o parser é ainda mais frágil: a gramática também não pode ser recursiva à esquerda. isso significa que não podemos ter uma regra do seguinte tipo:
+\[
+A \rightarrow A B
+\]
+também temos como contornar esse problema, mas é um pouco mais chato. para cada regra da forma:
+</p>
+\begin{align*}
+A \rightarrow &~ A \alpha\\
+A \rightarrow & ~\beta
+\end{align*}
+<p>
+criamos as seguintes regras:
+</p>
+\begin{align*}
+A \rightarrow &~ \beta A'\\
+A' \rightarrow &~ \alpha A'\\
+A' \rightarrow & ~\varepsilon
+\end{align*}
+<p>
+onde \(\varepsilon\) representa a palavra vazia.
+</p>
+
+<p>
+dessa forma, podemos transformar a seguinte gramática original não ambígua
+</p>
+\begin{align*}
+E \rightarrow &~ E+T ~ | ~ E-T ~ | ~ T\\
+T \rightarrow &~ T * F ~ | ~ F\\
+F \rightarrow & (E) ~| ~ num
+\end{align*}
+<p>
+em
+</p>
+\begin{align*}
+E \rightarrow &~ T E'\\
+E' \rightarrow &~ + T E' ~ | ~ - T E' ~ | ~ \varepsilon \\
+T \rightarrow &~ F T'\\
+T' \rightarrow &~ * F T' ~ | ~ \varepsilon \\
+F \rightarrow &~ ( E ) ~ | ~  num
+\end{align*}
+<p>
+que é um pouco mais chato de se implementar (mas ainda fácil)
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga18f712" class="outline-2">
+<h2 id="orga18f712"><span class="section-number-2">3.</span> implementação</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+poderíamos dividir tudo em vários arquivos e simplificar as coisas, mas como não é muito código, colocarei tudo no mesmo arquivo <code>.lex</code>.
+</p>
+
+<p>
+começamos nosso <code>expressoes_matematicas.lex</code> com o boilerplate padrão de arquivos C++
+</p>
+<div class="org-src-container">
+<pre class="src src-c">%<span style="color: #3a81c3;">{</span>
+<span style="color: #6c3163;">#include</span> <span style="color: #6c3163;">&lt;</span><span style="color: #2d9574;">iostream</span><span style="color: #6c3163;">&gt;</span>
+<span style="color: #6c3163;">#include</span> <span style="color: #6c3163;">&lt;</span><span style="color: #2d9574;">string</span><span style="color: #6c3163;">&gt;</span>
+<span style="color: #6c3163;">#include</span> <span style="color: #6c3163;">&lt;</span><span style="color: #2d9574;">stack</span><span style="color: #6c3163;">&gt;</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">para implementar a pilha</span>
+  
+<span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #715ab1;">token</span>;
+
+<span style="color: #3a81c3; font-weight: bold;">extern</span> <span style="color: #2d9574;">"C"</span> <span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #6c3163; font-weight: bold;">yylex</span><span style="color: #6c3163;">()</span>;
+<span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">para que o linker entenda que &#233; uma fun&#231;&#227;o externa</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">definida na biblioteca do lex</span>
+
+using <span style="color: #ba2f59; font-weight: bold;">namespace</span> <span style="color: #715ab1;">std</span>;
+
+<span style="color: #ba2f59; font-weight: bold;">string</span> <span style="color: #715ab1;">lexema</span>;
+
+stack&lt;string&gt; pilha;
+ 
+<span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">definimos as fun&#231;&#245;es que utilizaremos no c&#243;digo c++</span>
+<span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #6c3163; font-weight: bold;">Token</span><span style="color: #6c3163;">(</span><span style="color: #ba2f59; font-weight: bold;">int</span><span style="color: #6c3163;">)</span>;
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">push</span><span style="color: #6c3163;">(</span><span style="color: #ba2f59; font-weight: bold;">string</span><span style="color: #6c3163;">)</span>;
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">push_int</span><span style="color: #6c3163;">(</span><span style="color: #ba2f59; font-weight: bold;">int</span><span style="color: #6c3163;">)</span>;
+<span style="color: #ba2f59; font-weight: bold;">string</span> <span style="color: #6c3163; font-weight: bold;">pop</span><span style="color: #6c3163;">()</span>;
+<span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #6c3163; font-weight: bold;">pop_int</span><span style="color: #6c3163;">()</span>;
+ 
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">E</span><span style="color: #6c3163;">()</span>;
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">E_linha</span><span style="color: #6c3163;">()</span>;
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">T</span><span style="color: #6c3163;">()</span>;
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">T_linha</span><span style="color: #6c3163;">()</span>;
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">F</span><span style="color: #6c3163;">()</span>;
+
+<span style="color: #3a81c3; font-weight: bold;">enum</span> <span style="color: #6c3163;">{</span><span style="color: #715ab1;">INT</span>=256<span style="color: #6c3163;">}</span>; <span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">enumeracao dos tokens</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">como s&#243; temos um token, n&#227;o faz muito sentido usar enum</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">usei mais por conveni&#234;ncia, poderia apenas dar um #define</span>
+%<span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+<p>
+depois da declaração de funções e inclusão das bibliotecas relevantes, precisamos definir os tokens que o flex irá gerar. para isso, dividimos as declarações em duas partes: primeiro declaramos "variáveis" (ou nomes) que guardarão as expressões regulares que utilizaremos:
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #ba2f59; font-weight: bold;">WHITESPACE</span> <span style="color: #3a81c3;">[</span> \n\T<span style="color: #3a81c3;">]</span>
+NUM <span style="color: #3a81c3;">[</span>0-9<span style="color: #3a81c3;">]</span>+
+%%
+</pre>
+</div>
+<p>
+e depois, dizemos o que o lexer deve fazer quando encontrar cada uma das possibilidades:
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #3a81c3;">{</span>WHITESPACE<span style="color: #3a81c3;">}</span> <span style="color: #3a81c3;">{</span> <span style="color: #3a81c3;">}</span>
+<span style="color: #3a81c3;">{</span>NUM<span style="color: #3a81c3;">}</span> <span style="color: #3a81c3;">{</span> <span style="color: #3a81c3; font-weight: bold;">return</span> Token<span style="color: #6c3163;">(</span>INT<span style="color: #6c3163;">)</span>; <span style="color: #3a81c3;">}</span>
+
+. <span style="color: #3a81c3;">{</span> <span style="color: #3a81c3; font-weight: bold;">return</span> Token<span style="color: #6c3163;">(</span>*yytext<span style="color: #6c3163;">)</span>; <span style="color: #3a81c3;">}</span>
+
+%%
+
+<span style="color: #ba2f59; font-weight: bold;">int</span> Token<span style="color: #3a81c3;">(</span> <span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #715ab1;">tk</span> <span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">{</span>
+  lexema = yytext;
+  <span style="color: #3a81c3; font-weight: bold;">return</span> tk;
+<span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+<p>
+as linhas de código acima dizem para o lexer: se você encontrar um espaço, um tab ou uma quebra de linha, simplesmente ignore (não faça nada); se encontrar um ou mais números de 0 a 9 em sequência, leia todos e depois retorne o token <code>INT</code> (representado por um número na nossa enumeração); e por fim, se encontrar alguma sequência de caractéres que não se encaixa em nenhum desses dois padrões, retorne o valor deles em ascii (como inteiro). tudo que a função <code>Token</code> faz é guardar a string encontrada pelo lexer na variável <code>lexema</code> e depois retornar o token (inteiro).
+</p>
+
+<p>
+também criaremos uma função simples que retorna o próximo token (já que ao invés de procurar todos os tokens de uma vez, estaremos pegando um por um conforme for necessário):
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #6c3163; font-weight: bold;">next_token</span><span style="color: #3a81c3;">()</span> <span style="color: #3a81c3;">{</span>
+  <span style="color: #3a81c3; font-weight: bold;">return</span> yylex<span style="color: #6c3163;">()</span>;
+<span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+<p>
+em seguida, criamos também uma variável que procura por um caracter específico no input (a função que representará símbolos terminais):
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #ba2f59; font-weight: bold;">string</span> <span style="color: #6c3163; font-weight: bold;">nome</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #715ab1;">ch</span><span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">{</span>
+  <span style="color: #3a81c3; font-weight: bold;">if</span> <span style="color: #6c3163;">(</span>ch &gt;0 &amp;&amp; ch &lt; 256 <span style="color: #6c3163;">)</span>
+    <span style="color: #3a81c3; font-weight: bold;">return</span> string<span style="color: #6c3163;">(</span>1, ch<span style="color: #6c3163;">)</span>; <span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">retorna o caracter em ascii</span>
+  <span style="color: #3a81c3; font-weight: bold;">else</span> 
+    <span style="color: #3a81c3; font-weight: bold;">return</span> <span style="color: #2d9574;">"INT"</span>;
+  <span style="color: #3a81c3;">}</span>
+
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">match</span><span style="color: #3a81c3;">(</span> <span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #715ab1;">esperado</span> <span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">{</span>
+  <span style="color: #3a81c3; font-weight: bold;">if</span><span style="color: #6c3163;">(</span> token == esperado <span style="color: #6c3163;">)</span>
+    token = next_token<span style="color: #6c3163;">()</span>;
+  <span style="color: #3a81c3; font-weight: bold;">else</span> <span style="color: #6c3163;">{</span>
+    cout &lt;&lt; endl;
+    cout &lt;&lt; <span style="color: #2d9574;">"[ERRO] Esperava: "</span> &lt;&lt; nome<span style="color: #2d9574;">(</span>esperado<span style="color: #2d9574;">)</span>
+         &lt;&lt; <span style="color: #2d9574;">" mas achou: "</span> &lt;&lt; nome<span style="color: #2d9574;">(</span>token<span style="color: #2d9574;">)</span> &lt;&lt; endl; 
+    exit<span style="color: #2d9574;">(</span> 1 <span style="color: #2d9574;">)</span>;
+  <span style="color: #6c3163;">}</span>
+<span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+<p>
+a função compara os dois, e se não forem iguais levanta um erro e termina o programa. ela será a responsável por terminar o programa caso o input de fato não seja uma expressão válida, e portanto colocamos alguns casos para o debug.
+</p>
+
+<p>
+por fim, a parte essencial para computar os valores: push e pop. usamos a função push toda vez que queremos colocar um operador na pilha, e ao colocar o operador precisamos imediatamente realizar a operação (para que a prioridade das operações sejam respeitadas). ao colocar um número na pilha, não precisamos fazer nada então podemos usar outra função (push<sub>int</sub>) para tal. as funções pop e pop<sub>int</sub> só retiram o valor mais no topo da pilha e retornam-o como string e inteiro, respectivamente.
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">push</span><span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">string</span> <span style="color: #715ab1;">value</span><span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">{</span>
+  <span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #715ab1;">op1</span>, <span style="color: #715ab1;">op2</span>;
+  <span style="color: #3a81c3; font-weight: bold;">if</span> <span style="color: #6c3163;">(</span>value == <span style="color: #2d9574;">"+"</span><span style="color: #6c3163;">){</span>
+    op2 = pop_int<span style="color: #2d9574;">()</span>;
+    op1 = pop_int<span style="color: #2d9574;">()</span>;
+    push_int<span style="color: #2d9574;">(</span>op1 + op2<span style="color: #2d9574;">)</span>;
+  <span style="color: #6c3163;">}</span>
+  <span style="color: #3a81c3; font-weight: bold;">else</span> <span style="color: #3a81c3; font-weight: bold;">if</span> <span style="color: #6c3163;">(</span>value == <span style="color: #2d9574;">"-"</span><span style="color: #6c3163;">)</span> <span style="color: #6c3163;">{</span>
+    op2 = pop_int<span style="color: #2d9574;">()</span>;
+    op1 = pop_int<span style="color: #2d9574;">()</span>;
+    push_int<span style="color: #2d9574;">(</span>op1 - op2<span style="color: #2d9574;">)</span>;
+  <span style="color: #6c3163;">}</span>
+  <span style="color: #3a81c3; font-weight: bold;">else</span> <span style="color: #3a81c3; font-weight: bold;">if</span> <span style="color: #6c3163;">(</span>value == <span style="color: #2d9574;">"*"</span><span style="color: #6c3163;">){</span>
+    op2 = pop_int<span style="color: #2d9574;">()</span>;
+    op1 = pop_int<span style="color: #2d9574;">()</span>;
+    push_int<span style="color: #2d9574;">(</span>op1 * op2<span style="color: #2d9574;">)</span>;
+  <span style="color: #6c3163;">}</span>
+  <span style="color: #3a81c3; font-weight: bold;">else</span> <span style="color: #6c3163;">{</span>
+    cout &lt;&lt; <span style="color: #2d9574;">"[ERRO] operador n&#227;o identificado: "</span> &lt;&lt; value &lt;&lt; endl;
+    exit <span style="color: #2d9574;">(</span>123<span style="color: #2d9574;">)</span>;
+  <span style="color: #6c3163;">}</span>
+<span style="color: #3a81c3;">}</span>
+
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">push_int</span><span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #715ab1;">value</span><span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">{</span>
+  pilha.push<span style="color: #6c3163;">(</span> to_string<span style="color: #2d9574;">(</span>value<span style="color: #2d9574;">)</span> <span style="color: #6c3163;">)</span>;
+<span style="color: #3a81c3;">}</span>
+
+<span style="color: #ba2f59; font-weight: bold;">string</span> <span style="color: #6c3163; font-weight: bold;">pop</span><span style="color: #3a81c3;">()</span> <span style="color: #3a81c3;">{</span>
+  <span style="color: #ba2f59; font-weight: bold;">string</span> <span style="color: #715ab1;">temp</span> = pilha.top<span style="color: #6c3163;">()</span>;
+  pilha.pop<span style="color: #6c3163;">()</span>;
+  <span style="color: #3a81c3; font-weight: bold;">return</span> temp;
+<span style="color: #3a81c3;">}</span>
+
+<span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #6c3163; font-weight: bold;">pop_int</span><span style="color: #3a81c3;">()</span> <span style="color: #3a81c3;">{</span>
+  <span style="color: #ba2f59; font-weight: bold;">string</span> <span style="color: #715ab1;">temp</span> = pilha.top<span style="color: #6c3163;">()</span>;
+  pilha.pop<span style="color: #6c3163;">()</span>;
+  <span style="color: #3a81c3; font-weight: bold;">return</span> stoi<span style="color: #6c3163;">(</span>temp<span style="color: #6c3163;">)</span>;
+<span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+
+<p>
+podemos finalmente implementar o parser!
+</p>
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">E</span><span style="color: #3a81c3;">()</span> <span style="color: #3a81c3;">{</span>
+  T<span style="color: #6c3163;">()</span>;
+  E_linha<span style="color: #6c3163;">()</span>;
+<span style="color: #3a81c3;">}</span>
+
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">T</span><span style="color: #3a81c3;">()</span> <span style="color: #3a81c3;">{</span>
+  F<span style="color: #6c3163;">()</span>;
+  T_linha<span style="color: #6c3163;">()</span>;
+<span style="color: #3a81c3;">}</span>
+
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">E_linha</span><span style="color: #3a81c3;">()</span> <span style="color: #3a81c3;">{</span>
+  <span style="color: #3a81c3; font-weight: bold;">switch</span> <span style="color: #6c3163;">(</span>token<span style="color: #6c3163;">)</span> <span style="color: #6c3163;">{</span>
+  <span style="color: #3a81c3; font-weight: bold;">case</span> <span style="color: #2d9574;">'+'</span>: match<span style="color: #2d9574;">(</span><span style="color: #2d9574;">'+'</span><span style="color: #2d9574;">)</span>; T<span style="color: #2d9574;">()</span>; push<span style="color: #2d9574;">(</span><span style="color: #2d9574;">"+"</span><span style="color: #2d9574;">)</span>; E_linha<span style="color: #2d9574;">()</span>; <span style="color: #3a81c3; font-weight: bold;">break</span>;
+  <span style="color: #3a81c3; font-weight: bold;">case</span> <span style="color: #2d9574;">'-'</span>: match<span style="color: #2d9574;">(</span><span style="color: #2d9574;">'-'</span><span style="color: #2d9574;">)</span>; T<span style="color: #2d9574;">()</span>; push<span style="color: #2d9574;">(</span><span style="color: #2d9574;">"-"</span><span style="color: #2d9574;">)</span>; E_linha<span style="color: #2d9574;">()</span>; <span style="color: #3a81c3; font-weight: bold;">break</span>;
+  <span style="color: #6c3163;">}</span>
+<span style="color: #3a81c3;">}</span>
+
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">T_linha</span><span style="color: #3a81c3;">()</span> <span style="color: #3a81c3;">{</span>
+  <span style="color: #3a81c3; font-weight: bold;">switch</span> <span style="color: #6c3163;">(</span>token<span style="color: #6c3163;">)</span> <span style="color: #6c3163;">{</span>
+  <span style="color: #3a81c3; font-weight: bold;">case</span> <span style="color: #2d9574;">'*'</span>: match<span style="color: #2d9574;">(</span><span style="color: #2d9574;">'*'</span><span style="color: #2d9574;">)</span>; F<span style="color: #2d9574;">()</span>; push<span style="color: #2d9574;">(</span><span style="color: #2d9574;">"*"</span><span style="color: #2d9574;">)</span>; T_linha<span style="color: #2d9574;">()</span>; <span style="color: #3a81c3; font-weight: bold;">break</span>;
+  <span style="color: #6c3163;">}</span>
+<span style="color: #3a81c3;">}</span>
+
+<span style="color: #ba2f59; font-weight: bold;">void</span> <span style="color: #6c3163; font-weight: bold;">F</span><span style="color: #3a81c3;">()</span> <span style="color: #3a81c3;">{</span>
+  <span style="color: #3a81c3; font-weight: bold;">switch</span> <span style="color: #6c3163;">(</span>token<span style="color: #6c3163;">)</span> <span style="color: #6c3163;">{</span>
+  <span style="color: #3a81c3; font-weight: bold;">case</span> INT: <span style="color: #2d9574;">{</span>
+    <span style="color: #ba2f59; font-weight: bold;">string</span> <span style="color: #715ab1;">temp</span> = lexema;
+    match<span style="color: #67b11d;">(</span>INT<span style="color: #67b11d;">)</span>;
+    push_int<span style="color: #67b11d;">(</span>stoi<span style="color: #b1951d;">(</span>temp<span style="color: #b1951d;">)</span><span style="color: #67b11d;">)</span>;
+    <span style="color: #3a81c3; font-weight: bold;">break</span>;
+  <span style="color: #2d9574;">}</span>
+  <span style="color: #3a81c3; font-weight: bold;">case</span> <span style="color: #2d9574;">'('</span>: <span style="color: #2d9574;">{</span>
+    match<span style="color: #67b11d;">(</span><span style="color: #2d9574;">'('</span><span style="color: #67b11d;">)</span>; E<span style="color: #67b11d;">()</span>; match<span style="color: #67b11d;">(</span><span style="color: #2d9574;">')'</span><span style="color: #67b11d;">)</span>; <span style="color: #3a81c3; font-weight: bold;">break</span>;
+  <span style="color: #2d9574;">}</span>
+  <span style="color: #3a81c3; font-weight: bold;">default</span>: <span style="color: #2d9574;">{</span>
+    cout &lt;&lt; <span style="color: #2d9574;">"[ERRO] Operando esperado, encontrado: "</span> &lt;&lt; lexema &lt;&lt; endl;
+    exit<span style="color: #67b11d;">(</span>3<span style="color: #67b11d;">)</span>;
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #6c3163;">}</span>
+<span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+<p>
+as funções acima simplesmente chamam o lado direito das respectivas regras. utilizamos um switch case toda vez que podemos ter \(\varepsilon\) como possível saida (nesse caso, a função simplesmente não fará nada).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #ba2f59; font-weight: bold;">int</span> <span style="color: #6c3163; font-weight: bold;">main</span><span style="color: #3a81c3;">()</span> <span style="color: #3a81c3;">{</span>
+  token = next_token<span style="color: #6c3163;">()</span>; <span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">inicializamos o valor do token</span>
+  E<span style="color: #6c3163;">()</span>; <span style="color: #2aa1ae; background-color: #ecf3ec;">// </span><span style="color: #2aa1ae; background-color: #ecf3ec;">chamamos o ponto inicial do parser</span>
+  cout &lt;&lt; <span style="color: #2d9574;">"O resultado da opera&#231;&#227;o &#233;: "</span> &lt;&lt; pilha.top<span style="color: #6c3163;">()</span> &lt;&lt; endl;
+  <span style="color: #3a81c3; font-weight: bold;">return</span> 0;
+<span style="color: #3a81c3;">}</span>
+</pre>
+</div>
+<p>
+e pronto! está tudo implementado. conforme o parser processa o input, o valor da pilha irá automaticamente ser calculado, e no final, o único elemento na pilha deverá ser o resultado da computação. para compilar o programa, executamos as seguintes linhas de código:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">lex expressoes_matematicas.lex
+g++ lex.yy.c -o output -lfl
+</pre>
+</div>
+<p>
+e para calcular, devemos utilizar uma stream de caracteres terminada em EOF como input para o programa, como por exemplo:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #3a81c3;">echo</span> <span style="color: #2d9574;">"2 * 3 + 5"</span> | ./output
+</pre>
+</div>
+<p>
+que printará na tela "O resultado da operação é: 11". <b>eureka</b>!
+</p>
+
+<p>
+podemos até testar a prioridade com parênteses
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #3a81c3;">echo</span> <span style="color: #2d9574;">"(2 - 3) * 5"</span> | ./output
+</pre>
+</div>
+<p>
+que corretamente nos dá o valor -5.
+</p>
+
+<p>
+como só temos 3 operações implementadas (soma, subtração e multiplicação), as contas que podem ser feitas são um pouco limitadas. porém, não é dificil de adicionar novas operações, só precisamos implementá-la na gramática e na função push. a mais intuitiva (e óbvia) seria a de divisão, mas isso requeriria trabalharmos com floats, e confesso que fiquei um pouco com preguiça de usar floats assim, já que causaria varios impecílhos.
+</p>
+
+<p>
+devemos também lembrar de um fator muito importante: esse parser irá procurar pela primeira expressão válida na string. isso significa que caso tenhamos uma expressão válida seguida de uma expressão inválida, ele irá calcular o valor da expressão válida e terminar, ao invés de levantar um erro. os casos em que ele dará erro serão aqueles cuja primeira expressão é inválida (apenas). por exemplo
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #3a81c3;">echo</span> <span style="color: #2d9574;">"1 + 1 7"</span> | ./output
+</pre>
+</div>
+<p>
+resulta no valor 2, mas
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #3a81c3;">echo</span> <span style="color: #2d9574;">"1 * + 1 + 2"</span> | ./output
+</pre>
+</div>
+<p>
+levanta o erro "[ERRO] Operando esperado, encontrado: +".
+</p>
+
+<p>
+vale notar que esse comportamento de processar apenas a primeira expressão válida é esperado, e é essencial no parser que implementaremos no próximo <a href="https://o-santi.github.io/posts/parser-haskell/">post</a>.
+</p>
+
+<p>
+o código fonte está disponível <a href="file:///src/expressoes_matematicas.lex">aqui</a> (e no repositório do github deste site).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: Jan 10, 2022-001641783600</p>
+<p class="author">Author: @o-santi</p>
+<p class="date">Created: Aug  9, 2022-001660067135</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

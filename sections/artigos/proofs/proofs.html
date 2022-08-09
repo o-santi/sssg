@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- Aug  9, 2022-001660067134 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>dividindo números pares: uma breve introdução a proof-as-programs</title>
+<meta name="author" content="@o-santi" />
+<meta name="description" content="utilizando matemática complicada para fazer o que você aprendeu na segunda série" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+</style>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">dividindo números pares: uma breve introdução a proof-as-programs</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org2c068fb">1. os naturais</a></li>
+<li><a href="#org37c0410">2. sobre as diferentes igualdades</a></li>
+<li><a href="#orga686268">3. multiplicação</a></li>
+<li><a href="#org8d57179">4. quantificador existencial</a></li>
+<li><a href="#org61c4c88">5. números pares</a></li>
+</ul>
+</div>
+</div>
+<p>
+quando estudamos provas matemáticas (em aulas de álgebra ou de teoria dos números), muitas vezes vemos provas obtusas, confusas, ou que não nos passam confiança o suficiente. em especial, muitas vezes vemos provas que falam sobre a existência de algum objeto, sem dizer <i>qual</i> é o objeto: o caso clássico são as provas que utilizam o <a href="https://pt.wikipedia.org/wiki/Princ%C3%ADpio_da_casa_dos_pombos">princípio da casa dos pombos</a>, que frequentemente vemos ainda no ensino médio. dizemos que essas provas não são <b>construtivas</b>, visto que não são capazes de construir o objeto cuja existência é atestada.
+</p>
+
+<p>
+felizmente, a não construtividade geralmente pode ser traçada até os axiomas que usamos na prova, e se tomarmos cuidado com quais axiomas empregamos, podemos sempre escrever provas construtivas. dois axiomas que sabidamente não obedecem a construtividade são <a href="https://pt.wikipedia.org/wiki/Dupla_nega%C3%A7%C3%A3o">a dupla negação</a> e o <a href="https://pt.wikipedia.org/wiki/Lei_do_terceiro_exclu%C3%ADdo">principio do terceiro excluido</a>. isso não significa que ambos são necessáriamente falsos, apenas que utilizá-los em provas destroi a possibilidade de acharmos os elementos que queremos.
+</p>
+
+<p>
+mas por que deveríamos ligar para a construtividade de provas? boa pergunta. por mais que não seja óbvio, todas as provas construtivas podem ser transformadas em programas, que podem ser executados em linguagens específicas. para exemplificar esse conceito, construiremos uma prova bem simples: se um número natural \(x\) é par, então existe outro número natural, \(y\), tal que \(x = 2y\). escreveremos essa prova em <a href="https://agda.readthedocs.io/en/v2.6.2.2/">agda</a> pois é a linguagem de tipos dependentes que estou aprendendo no momento. não ensinarei a instalar pois não é simples, mas se quiserem acompanhar a prova, veja o <a href="https://agda.readthedocs.io/en/v2.6.2.2/getting-started/installation.html">tutorial oficial</a>.
+</p>
+
+<div id="outline-container-org2c068fb" class="outline-2">
+<h2 id="org2c068fb"><span class="section-number-2">1.</span> os naturais</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+começamos definindo o que queremos dizer com "números naturais". tradicionalmente, falamos dos números naturais em linguagens funcionais através dos <a href="https://pt.wikipedia.org/wiki/Axiomas_de_Peano">axiomas de Peano</a>; isto é, definimos que 0 é um número natural, e definimos uma função de sucessor, tal que o sucessor de um número natural também é um número natural. o número 1 é representado com sucessor de 0, o número 2 como sucessor do sucessor de 0, e assim por diante.
+</p>
+
+<p>
+em agda, podemos definir o tipo dos números naturais \(\mathbb{N}\) como:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">module</span> even <span style="color: #3a81c3; font-weight: bold;">where</span>
+
+<span style="color: #3a81c3; font-weight: bold;">data</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">Set</span> <span style="color: #3a81c3; font-weight: bold;">where</span>
+  zero <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span>
+  succ <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span>
+
+<span style="color: #6c3163;">{-# BUILTIN NATURAL &#8469; #-}</span>
+</pre>
+</div>
+<p>
+primeiramente, definimos o módulo <code>even</code> em um arquivo chamado <code>even.agda</code>, e é estritamente necessário que o módulo mais exterior de um arquivo tenha o mesmo nome do arquivo. além disso, é importante notar que os nomes de variáveis em agda podem ser (quase) qualquer sequência de caractéres unicode, e portanto o nome do tipo dos números naturais é o caracter \(\mathbb{N}\).
+</p>
+
+<p>
+com o código acima dizemos que o tipo dos naturais \(\mathbb{N}\) tem exatamente 2 <b>construtores</b>: <code>zero</code>, que não recebe nenhum argumento, e <code>succ</code>, que recebe um natural e retorna outro natural. saber que esse tipo tem exatamente dois construtores nos permite implementar funções utilizando <i>pattern matching</i>, isto é, definimos o que uma função faz baseado em qual construtor ela recebe.
+</p>
+
+<p>
+por fim, dizemos que o nosso tipo \(\mathbb{N}\) é o tipo dos números naturais para o compilador de agda, que irá automaticamente transformar os números literais (1, 2, 3&#x2026;) na representação do nosso tipo.
+</p>
+
+<p>
+para explicitar <i>pattern matching</i>, definimos a função de soma de 2 naturais:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">_</span><span style="color: #6c3163; font-weight: bold;">+</span><span style="color: #3a81c3; font-weight: bold;">_</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span>
+0        <span style="color: #715ab1;">+</span> x <span style="color: #715ab1;">=</span> x
+<span style="color: #3a81c3;">(</span>succ n<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">+</span> x <span style="color: #715ab1;">=</span> succ <span style="color: #3a81c3;">(</span>n <span style="color: #715ab1;">+</span> x<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+primeiro, é importante notar como definimos função <code>+</code>: os caracteres <code>_</code> de cada lado indicam onde entram os argumentos quando chamarmos a função (ou seja, é uma função que espera um argumento do lado esquerdo e um argumento do lado direito, denominada <i>infix</i>). também denotamos que ela espera 2 naturais, e retorna um natural.
+</p>
+
+<p>
+utilizamos pattern matching na primeira variável, que separa a função em dois casos:
+</p>
+<ul class="org-ul">
+<li>quando o primeiro argumento é zero, retornamos o segundo argumento</li>
+<li>quando o primeiro argumento é o sucessor de um natural <code>n</code>, retornamos o sucessor da soma \(n + x\) (note a recursão envolvida).</li>
+</ul>
+<p>
+o compilador de agda é capaz de perceber varias coisas sobre essa definição. primeiramente, ele entende que essas duas equações são suficientes para cobrir todos os possíveis casos da função. além disso, ele também percebe que, por mais que estejamos definindo a soma de forma recursiva (utilizando <code>+</code> dentro da definição de <code>+</code>), a chamada recursiva feita é estruturalmente menor que o caso inicial, e portanto ele é capaz de garantir para nós que a função irá terminar em todos os casos. isso se dá pois o compilador nos proibe de escrever funções que ele não é capaz de checar que irão sempre terminar.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org37c0410" class="outline-2">
+<h2 id="org37c0410"><span class="section-number-2">2.</span> sobre as diferentes igualdades</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+para introduzir o conceito de provas, vamos ver uma prova bem simples sobre a nossa definição de soma: que somar 0 à direita é equivalente a não fazer nada, isto é, \(x + 0 = x\) para qualquer x. é importante ressaltar a diferença entre somar à direita e à esquerda, já que na definição da soma, fazemos <i>pattern matching</i> explicitamente no primeiro elemento. quando esse elemento não possui um valor específico, o compilador não sabe o que fazer com ele e não é capaz de reduzir a expressão. entretanto, podemos <b>provar</b> que isso é verdade.
+</p>
+
+<p>
+primeiramente, precisamos entender a ideia de <i>proof-as-programs</i>. em linguagens de programação com tipos dependentes, os tipos das variáveis representam proposições de teoremas. por exemplo, o tipo <code>∀ (x : ℕ) → 0 + x ≡ x</code> representa a proposição "para todo x natural, x + 0 = x", e provamos essa proposição construindo um objeto que tem exatamente esse tipo (usando o jargão da área, achamos uma <i>evidência</i> para a proposição). refutar essa proposição significa mostrar que o tipo é equivalente ao conjunto vazio (que canonicamente não possui construtores).
+</p>
+
+<p>
+é importante notar, entretanto, o símbolo ≡ no tipo. isso não é a toa: existem diferenças entre a igualdade proposicional (mostrada acima, denotada por <code>≡</code>) e igualdade <i>judgmental</i> (me recuso a traduzir para "crítica"). por exemplo, não há proposição quando dizemos para o compilador "0 + a = a" na definição da equação da soma, não estamos propondo isso mas sim postulando a verdade; à esse tipo de igualdade damos o nome <i>judgmental equality</i>.
+</p>
+
+<p>
+por outro lado, também temos um tipo de igualdade entre tipos, estudada pela primeira vez na teoria de Martin-Löf, que relaciona cada tipo à uma igualdade diferente. isto é, o tipo dos elementos comparados é levado em conta ao definir a igualdade que estamos tratando. mais do que isso, só faz sentido falar dessa noção de igualdade quando os dois elementos têm exatamente o mesmo tipo. definimos as possiveis igualdades da seguinte maneira:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">data</span> <span style="color: #3a81c3; font-weight: bold;">_</span><span style="color: #715ab1;">&#8801;</span><span style="color: #3a81c3; font-weight: bold;">_</span> <span style="color: #3a81c3;">{</span>l<span style="color: #3a81c3;">}</span> <span style="color: #3a81c3;">{</span><span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">Set</span> l<span style="color: #3a81c3;">}</span> <span style="color: #3a81c3;">(</span>x <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">A</span><span style="color: #3a81c3;">)</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">Set</span> l <span style="color: #3a81c3; font-weight: bold;">where</span>
+  refl <span style="color: #ba2f59; font-weight: bold;">:</span> x <span style="color: #715ab1;">&#8801;</span> x
+<span style="color: #6c3163;">{-# BUILTIN EQUALITY _&#8801;_  #-}</span>
+</pre>
+</div>
+<p>
+sim, tem muita coisa acontecendo, mas a ideia dessa definição é simples. o tipo da proposição de igualdade entre termos primeiro recebe um tipo (em agda, representado como <code>Set</code> (não me peça pra explicar o <code>l</code>, é mais chato do que parece)), depois o elemento que queremos a igualdade, e ele nos retorna uma prova de que <code>x ≡ x</code>, através do único construtor <code>refl</code> (de reflexividade). usamos chaves ao invés de parênteses quando queremos que o compilador infira o elemento que deve entrar no lugar (chamados argumentos implicitos).
+</p>
+
+<p>
+você agora deve estar se perguntando "tá, mas se o construtor só recebe um argumento, como eu provo que duas coisas diferentes são iguais?" ótima pergunta. as provas de igualdade em agda se baseiam a alterar um dos lados da igualdade até que o compilador se convença de que os dois lados são iguais. por exemplo, veremos a prova de que <code>x + 0 ≡ x</code>. entretanto, antes disso, precisamos provar a congruência da igualdade, isto é, se dois lados da igualdade são iguais, então podemos aplicar uma função <code>f</code> pros dois lados e a igualdade continuará valendo.
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell">cong <span style="color: #6c3163; font-weight: bold;">:</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">{</span><span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #ba2f59; font-weight: bold;">B</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">Set</span><span style="color: #3a81c3;">}</span>
+     <span style="color: #715ab1;">&#8594;</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">{</span>x y <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">A</span><span style="color: #3a81c3;">}</span>
+     <span style="color: #715ab1;">&#8594;</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">(</span>f <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">B</span><span style="color: #3a81c3;">)</span>
+     <span style="color: #715ab1;">&#8594;</span> <span style="color: #3a81c3;">(</span>x <span style="color: #715ab1;">&#8801;</span> y<span style="color: #3a81c3;">)</span>
+     <span style="color: #2aa1ae; background-color: #ecf3ec;">--</span><span style="color: #2aa1ae; background-color: #ecf3ec;">-------------</span>
+     <span style="color: #715ab1;">&#8594;</span> f x <span style="color: #715ab1;">&#8801;</span> f y
+<span style="color: #6c3163; font-weight: bold;">cong</span> f refl <span style="color: #715ab1;">=</span> refl
+</pre>
+</div>
+<p>
+não se assuste, ainda é bem simples. estamos dizendo para o compilador: me dê dois tipos, <code>A</code> e <code>B</code>, dois elementos de <code>A</code>, uma função que transforma elementos de <code>A</code> em elementos de <code>B</code>, e uma prova de que x é igual a y, e eu (a função) retornarei uma prova de que aplicar <code>f</code> a <code>x</code> é igual a aplicar <code>f</code> a <code>y</code>. os -'s são puramente estéticos, já que agda utiliza <code>--</code> para comentários.
+</p>
+
+<p>
+e a construção da congruência é extremamente óbvia: a linguagem é capaz de inferir que o único construtor para a igualdade <code>x≡y</code> é <code>refl</code> (por definição), e portanto só precisamos analisar esse caso. quando escrevemos essa parte, o compilador é capaz de substituir <code>y</code> em todos os lugares que <code>x</code> aparece no que queremos provar (<code>f x ≡ f y</code>) e nos pede pra provar que <code>f x ≡ f x</code>. mas isso é moleza, basta usar a reflexividade novamente (e o compilador é capaz de inferir os argumentos necessários para isso funcionar).
+</p>
+
+<p>
+visto isso, podemos provar que somar 0 à direita de um número ainda retorna o próprio número:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell">x<span style="color: #6c3163; font-weight: bold;">+</span>0<span style="color: #715ab1;">=</span>x <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">(</span>x <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #3a81c3;">(</span>x <span style="color: #715ab1;">+</span> 0<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&#8801;</span> x
+x<span style="color: #6c3163; font-weight: bold;">+</span>0<span style="color: #715ab1;">=</span>x 0        <span style="color: #715ab1;">=</span> refl
+x<span style="color: #6c3163; font-weight: bold;">+</span>0<span style="color: #715ab1;">=</span>x <span style="color: #3a81c3;">(</span>succ n<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> cong succ <span style="color: #3a81c3;">(</span>x<span style="color: #715ab1;">+</span>0<span style="color: #715ab1;">=</span>x n<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+note que o nome da variável que representa a nossa prova é <code>x+0=x</code>, eu não estava brincando quando eu disse <i>qualquer</i> sequência unicode.
+</p>
+
+<p>
+no caso em que o número é 0, essa prova se reduz à <code>0 + 0 ≡ 0</code>, onde ele consegue inferir que o lado esquerdo reduz para <code>0 ≡ 0</code>, e podemos provar trivialmente com reflexividade.
+</p>
+
+<p>
+no caso em que o número é um sucessor, utilizamos indução! como assim? agda nos permite usar indução contanto que a chamada recursiva seja estruturalmente menor, isto significa que não podemos usar <code>x+0=x (succ n)</code> para provar esse caso (pois cairíamos num loop infinito), entretanto, podemos chamar <code>x+0=x n</code>, que nos dá uma prova de que <code>n + 0 ≡ n</code>. utilizando a congruência, aplicamos a função <code>succ</code> em ambos os lados, transformando a equação em <code>succ (n + 0) ≡ succ n</code>, e magicamente, o compilador consegue entender que essa equação é do mesmo tipo que <code>(succ n) + 0 ≡ succ n</code>, e nos permite provar isso.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga686268" class="outline-2">
+<h2 id="orga686268"><span class="section-number-2">3.</span> multiplicação</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+definimos a multiplicação de dois números de maneira parecida com a soma
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">_</span><span style="color: #6c3163; font-weight: bold;">*</span><span style="color: #3a81c3; font-weight: bold;">_</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span>
+0 <span style="color: #715ab1;">*</span> m <span style="color: #715ab1;">=</span> 0
+<span style="color: #3a81c3;">(</span>succ n<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">*</span> m <span style="color: #715ab1;">=</span> m <span style="color: #715ab1;">+</span> <span style="color: #3a81c3;">(</span>n <span style="color: #715ab1;">*</span> m<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+ela utiliza apenas dois fatos bem conhecidos
+</p>
+<ul class="org-ul">
+<li>que 0 vezes qualquer número é 0</li>
+<li>que (1 + n) * m = m + m * n</li>
+</ul>
+<p>
+note que esses dois casos são suficientes pra calcular completamente a multiplicação de quaisquer dois números naturais. note também que, novamente, utilizamos recursão para calcular no caso do sucessor.
+</p>
+
+<p>
+podemos provar algo parecido com `x+0=x`: que 1 é o elemento neutro da multiplicação.
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell">x<span style="color: #6c3163; font-weight: bold;">*</span>1<span style="color: #715ab1;">=</span>x <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">(</span>x <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #3a81c3;">(</span>x <span style="color: #715ab1;">*</span> 1<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&#8801;</span> x
+x<span style="color: #6c3163; font-weight: bold;">*</span>1<span style="color: #715ab1;">=</span>x 0        <span style="color: #715ab1;">=</span> refl
+x<span style="color: #6c3163; font-weight: bold;">*</span>1<span style="color: #715ab1;">=</span>x <span style="color: #3a81c3;">(</span>succ n<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> cong succ <span style="color: #3a81c3;">(</span>x<span style="color: #715ab1;">*</span>1<span style="color: #715ab1;">=</span>x n<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+a prova quando multiplicamos pela esquerda é análoga.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org8d57179" class="outline-2">
+<h2 id="org8d57179"><span class="section-number-2">4.</span> quantificador existencial</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+uma coisa comum de se pensar é que não podemos falar sobre a existência de variáveis no cenário construtivo. entretanto isso é falso, e na verdade implementamos de uma maneira bem interessante: o par dependente. como assim? vejamos a implementação:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">data</span> <span style="color: #ba2f59; font-weight: bold;">&#931;</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">Set</span><span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">B</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">Set</span><span style="color: #3a81c3;">)</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">Set</span> <span style="color: #3a81c3; font-weight: bold;">where</span>
+  <span style="color: #3a81c3;">&#10216;</span><span style="color: #3a81c3; font-weight: bold;">_</span>,<span style="color: #3a81c3; font-weight: bold;">_</span><span style="color: #3a81c3;">&#10217;</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #3a81c3;">(</span>x <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">A</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">B</span> x <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">&#931;</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #ba2f59; font-weight: bold;">B</span>
+
+<span style="color: #ba2f59; font-weight: bold;">&#931;</span><span style="color: #6c3163; font-weight: bold;">-</span>syntax <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">&#931;</span>
+<span style="color: #6c3163; font-weight: bold;">syntax</span> <span style="color: #ba2f59; font-weight: bold;">&#931;</span><span style="color: #715ab1;">-</span>syntax <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #3a81c3;">(</span>&#955; x <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">B</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> <span style="color: #ba2f59; font-weight: bold;">&#931;</span><span style="color: #3a81c3;">[</span> x <span style="color: #715ab1;">&#8712;</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #3a81c3;">]</span> <span style="color: #ba2f59; font-weight: bold;">B</span>
+</pre>
+</div>
+<p>
+eu sei. parece grego. até porque \(\Sigma\) é uma letra grega. mas não vem ao caso. o tipo <code>Σ</code> representa todos os pares de elementos onde o segundo elemento pode depender do valor do primeiro.
+</p>
+
+<p>
+isto é, ele espera um tipo <code>A</code> e uma função <code>B</code>, que recebe um elemento de <code>A</code> e retorna qualquer coisa que esteja em qualquer tipo (ou quase, <code>Set</code> não é exatamente o tipo de todos os tipos, mas é algo análogo). ele também só possui um construtor, que (utilizando novamente a notação <code>_</code> para localização de argumentos) espera que o primeiro argumento seja do tipo <code>A</code>, e o segundo seja do tipo <code>B x</code> onde x é um elemento de <code>A</code>. por fim, definimos uma sintaxe bonitinha para deixar mais clara a relação entre <code>A</code> e <code>B</code> quando escrevemos.
+</p>
+
+<p>
+agora você deve estar se perguntando "mas aonde que isso representa a existência de algo??". sim, não é óbvio num primeiro olhar. o que o tipo <code>Σ</code> expressa é a capacidade de fazer uma afirmação que dependa do valor de um elemento do domínio <code>A</code>, isto é, a própria afirmação feita pode depender de qual elemento estamos falando.
+</p>
+
+<p>
+por exemplo, podemos construir o seguinte teorema: existe um elemento nos números naturais \(k\) tal que \(k + x = x\) para todo \(x\):
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell">exists<span style="color: #6c3163; font-weight: bold;">-</span>neutral<span style="color: #715ab1;">-</span>element <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#931;</span><span style="color: #3a81c3;">[</span> k <span style="color: #715ab1;">&#8712;</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #3a81c3;">]</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">(</span>x <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #3a81c3;">(</span><span style="color: #6c3163;">(</span>x <span style="color: #715ab1;">+</span> k<span style="color: #6c3163;">)</span> <span style="color: #715ab1;">&#8801;</span> x<span style="color: #3a81c3;">)</span>
+exists<span style="color: #6c3163; font-weight: bold;">-</span>neutral<span style="color: #715ab1;">-</span>element <span style="color: #715ab1;">=</span> <span style="color: #3a81c3;">&#10216;</span> 0 , x<span style="color: #715ab1;">+</span>0<span style="color: #715ab1;">=</span>x <span style="color: #3a81c3;">&#10217;</span> 
+</pre>
+</div>
+<p>
+ou seja, uma "prova de existência" dessa forma envolve primeiro mostrar o elemento que estamos evidênciando (neste caso, 0), e depois uma prova de que ele satisfaz o que queremos (que, no caso, depende do valor do elemento 0). a linguagem é inteligente o suficiente para perceber que, substituindo 0 na equação para <code>k</code> dada no tipo, temos exatamente <code>x+0=x</code>
+</p>
+
+<p>
+utilizaremos essa noção de existência em seguida para falar dos números pares.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org61c4c88" class="outline-2">
+<h2 id="org61c4c88"><span class="section-number-2">5.</span> números pares</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+dado todo esse preâmbulo, comecemos a parte interessante. caracterizaremos os números pares de uma maneira um pouco diferente da usual, isto é, ao invés de falar que são aqueles para qual uma função retorna <code>true</code>, caracterizaremos como todo número para o qual conseguimos construir um elemento no tipo dos pares. observe a seguinte definição:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">data</span> even <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">Set</span>
+<span style="color: #3a81c3; font-weight: bold;">data</span> odd  <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">Set</span>
+
+<span style="color: #3a81c3; font-weight: bold;">data</span> even <span style="color: #3a81c3; font-weight: bold;">where</span>
+  even<span style="color: #715ab1;">-</span>zero <span style="color: #ba2f59; font-weight: bold;">:</span> even zero
+  even<span style="color: #715ab1;">-</span>succ <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">{</span>n <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span><span style="color: #3a81c3;">}</span>
+    <span style="color: #715ab1;">&#8594;</span> odd n
+      <span style="color: #2aa1ae; background-color: #ecf3ec;">--</span><span style="color: #2aa1ae; background-color: #ecf3ec;">----------</span>
+    <span style="color: #715ab1;">&#8594;</span> even <span style="color: #3a81c3;">(</span>succ n<span style="color: #3a81c3;">)</span>
+
+<span style="color: #3a81c3; font-weight: bold;">data</span> odd <span style="color: #3a81c3; font-weight: bold;">where</span>
+  odd<span style="color: #715ab1;">-</span>succ <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">{</span>n <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span><span style="color: #3a81c3;">}</span>
+    <span style="color: #715ab1;">&#8594;</span> even n
+      <span style="color: #2aa1ae; background-color: #ecf3ec;">--</span><span style="color: #2aa1ae; background-color: #ecf3ec;">---------</span>
+    <span style="color: #715ab1;">&#8594;</span> odd <span style="color: #3a81c3;">(</span>succ n<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+diremos que um número <code>n</code> é par exatamente quando temos um elemento que popula o tipo <code>even n</code> (e, analogamente, impar quando houver elemento em <code>odd n</code>). agora resta explicar porque isso sequer faz sentido.
+</p>
+
+<p>
+observe que tanto <code>even</code> quanto <code>odd</code> são famílias de tipos (dizemos que são tipos <i>indexados</i>, nesse caso por inteiros). além disso, tanto <code>even-succ</code> quanto <code>odd-succ</code> são definidos em termos um do outro, e não é claro como isso faz sentido. mas fique tranquilo, é bem óbvio.
+</p>
+
+<p>
+primeiro, observe o construtor <code>even-zero</code>. por definição, dizemos que é um elemento do tipo <code>even 0</code>, ou seja, estamos postulando que 0 é par, dando um construtor trivial para isso. observando logo em seguida <code>odd-succ</code>, vemos que ele é um construtor que recebe um elemento que popula <code>even n</code> e devolve um elemento de <code>odd (n + 1)</code>, ou seja, nos afirma que se sabemos que um número é par, seu sucessor deve ser ímpar. da mesma forma, o construtor <code>even-succ</code> evidencia que o sucessor de um número ímpar é um número par.
+</p>
+
+<p>
+por exemplo, <code>even-zero</code> é um elemento que popula <code>even 0</code> (0 é par), <code>odd-succ even-zero</code> popula <code>odd 1</code> (1 é ímpar), <code>even-succ (odd-succ even-zero)</code> popula <code>even 2</code> (2 é par) e assim por diante.
+</p>
+
+<p>
+um teorema simples e óbvio de provar neste momento é que para todo natural, ou ele é ímpar ou é par. mas para podermos provar isso, é necessário entender a noção de <i>ou</i>. em agda, representamos esse tipo do <i>ou</i> (também chamado de soma disjunta) como <code>Either</code>, isto é:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell"><span style="color: #3a81c3; font-weight: bold;">data</span> <span style="color: #ba2f59; font-weight: bold;">Either</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">Set</span><span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">(</span><span style="color: #ba2f59; font-weight: bold;">B</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">Set</span><span style="color: #3a81c3;">)</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">Set</span> <span style="color: #3a81c3; font-weight: bold;">where</span>
+  left  <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">Either</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #ba2f59; font-weight: bold;">B</span>
+  right <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">B</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">Either</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #ba2f59; font-weight: bold;">B</span>
+</pre>
+</div>
+<p>
+o tipo espera dois tipos, <code>A</code> e <code>B</code>, e nos permite construir uma prova de <code>Either A B</code> utilizando apenas <code>A</code> ou apenas <code>B</code>, através dos construtores <code>left</code> e <code>right</code>.
+</p>
+
+<p>
+podemos enunciar o teorema supracitado como
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell">even<span style="color: #6c3163; font-weight: bold;">-</span>or<span style="color: #715ab1;">-</span>odd <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">(</span>n <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">Either</span> <span style="color: #3a81c3;">(</span>even n<span style="color: #3a81c3;">)</span> <span style="color: #3a81c3;">(</span>odd n<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+e construimos ele da seguinte forma:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell">even<span style="color: #6c3163; font-weight: bold;">-</span>or<span style="color: #715ab1;">-</span>odd 0 <span style="color: #715ab1;">=</span> left even<span style="color: #715ab1;">-</span>zero
+even<span style="color: #6c3163; font-weight: bold;">-</span>or<span style="color: #715ab1;">-</span>odd <span style="color: #3a81c3;">(</span>succ n<span style="color: #3a81c3;">)</span> with <span style="color: #3a81c3;">(</span>even<span style="color: #715ab1;">-</span>or<span style="color: #715ab1;">-</span>odd n<span style="color: #3a81c3;">)</span>
+<span style="color: #715ab1;">...</span>                     <span style="color: #715ab1;">|</span> left even<span style="color: #715ab1;">-</span>zero <span style="color: #715ab1;">=</span> right <span style="color: #3a81c3;">(</span>odd<span style="color: #715ab1;">-</span>succ even<span style="color: #715ab1;">-</span>zero<span style="color: #3a81c3;">)</span>
+<span style="color: #715ab1;">...</span>                     <span style="color: #715ab1;">|</span> left <span style="color: #3a81c3;">(</span>even<span style="color: #715ab1;">-</span>succ o<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> right <span style="color: #3a81c3;">(</span>odd<span style="color: #715ab1;">-</span>succ <span style="color: #6c3163;">(</span>even<span style="color: #715ab1;">-</span>succ o<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span>
+<span style="color: #715ab1;">...</span>                     <span style="color: #715ab1;">|</span> right <span style="color: #3a81c3;">(</span>odd<span style="color: #715ab1;">-</span>succ e<span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">=</span> left <span style="color: #3a81c3;">(</span>even<span style="color: #715ab1;">-</span>succ <span style="color: #6c3163;">(</span>odd<span style="color: #715ab1;">-</span>succ e<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+calma, <i>with</i>? e o que esses <code>...</code>?? primeiramente, o caso base é bem óbvio: 0 é par, e pra ele retornamos o construtor <code>even-zero</code> (que popula <code>even 0</code>).
+</p>
+
+<p>
+no caso recursivo, a prova é um pouco mais envolvida. a notação <code>with (f x)</code> após o caso nos permite aplicar <code>f x</code> e fazer <i>pattern matching</i> no resultado de <code>f x</code> antes de retornar a função original. neste caso, estamos analisando o resultado da própria recursão:
+</p>
+<ul class="org-ul">
+<li>se <code>n = 0</code>, então <code>(succ n) = 1</code>, e podemos construir o elemento que popula <code>odd 1</code> (aplicando depois <code>right</code>, pois lembre-se que o tipo da prova é um <code>Either</code>)</li>
+<li>se <code>n</code> é par, <code>(succ n)</code> é ímpar, e para mostrar isso basta aplicarmos <code>odd-succ</code> no elemento que evidencia <code>even n</code>.</li>
+<li>se <code>n</code> é ímpar, então <code>(succ n)</code> é par, e, analogamente, aplicamos <code>even-succ</code>.</li>
+</ul>
+<p>
+o que é importante notar sobre essa prova é o seguinte: ela também é um programa que determina se um número é par ou ímpar, ou melhor dizendo, ela é <b>exatamente</b> o programa que determina se o número é par ou ímpar.
+</p>
+
+<p>
+isto significa que podemos rodar a nossa prova com um número específico, como <code>even-or-odd 5</code>, que nos dá o resultado <code>right (odd-succ (even-succ (odd-succ (even-succ (odd-succ even-zero)))))</code>. ele evidencia que <code>5</code> é um número ímpar, e nos dá um elemento de <code>odd 5</code>.
+</p>
+
+<p>
+dado isso, fica mais claro como enunciamos a prova de que se \(x\) é par, então existe \(y\) tal que \(x = 2y\). para estatá-las, escreveremos em conjunto a prova análoga para quando \(x\) é ímpar.
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell">even<span style="color: #6c3163; font-weight: bold;">-</span><span style="color: #ba2f59; font-weight: bold;">&#931;</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">{</span>n <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span><span style="color: #3a81c3;">}</span> <span style="color: #715ab1;">&#8594;</span> even n <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">&#931;</span><span style="color: #3a81c3;">[</span> m <span style="color: #715ab1;">&#8712;</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #3a81c3;">]</span> <span style="color: #3a81c3;">(</span>     <span style="color: #6c3163;">(</span>m <span style="color: #715ab1;">*</span> 2<span style="color: #6c3163;">)</span>  <span style="color: #715ab1;">&#8801;</span> n<span style="color: #3a81c3;">)</span>
+odd<span style="color: #6c3163; font-weight: bold;">-</span><span style="color: #ba2f59; font-weight: bold;">&#931;</span>  <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #715ab1;">&#8704;</span> <span style="color: #3a81c3;">{</span>n <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span><span style="color: #3a81c3;">}</span> <span style="color: #715ab1;">&#8594;</span> odd n  <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">&#931;</span><span style="color: #3a81c3;">[</span> m <span style="color: #715ab1;">&#8712;</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span> <span style="color: #3a81c3;">]</span> <span style="color: #3a81c3;">(</span><span style="color: #6c3163;">(</span>1 <span style="color: #715ab1;">+</span> <span style="color: #2d9574;">(</span>m <span style="color: #715ab1;">*</span> 2<span style="color: #2d9574;">)</span><span style="color: #6c3163;">)</span> <span style="color: #715ab1;">&#8801;</span> n<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+e construimos ela com recursão mútua:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell">even<span style="color: #6c3163; font-weight: bold;">-</span><span style="color: #ba2f59; font-weight: bold;">&#931;</span> even<span style="color: #715ab1;">-</span>zero         <span style="color: #715ab1;">=</span> <span style="color: #3a81c3;">&#10216;</span> 0 , refl <span style="color: #3a81c3;">&#10217;</span>
+even<span style="color: #6c3163; font-weight: bold;">-</span><span style="color: #ba2f59; font-weight: bold;">&#931;</span> <span style="color: #3a81c3;">(</span>even<span style="color: #715ab1;">-</span>succ odd<span style="color: #715ab1;">-</span>n<span style="color: #3a81c3;">)</span> with <span style="color: #3a81c3;">(</span>odd<span style="color: #715ab1;">-</span><span style="color: #ba2f59; font-weight: bold;">&#931;</span> odd<span style="color: #715ab1;">-</span>n<span style="color: #3a81c3;">)</span>
+<span style="color: #715ab1;">...</span>                         <span style="color: #715ab1;">|</span> <span style="color: #3a81c3;">&#10216;</span> m , refl <span style="color: #3a81c3;">&#10217;</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3;">&#10216;</span> <span style="color: #6c3163;">(</span>succ m<span style="color: #6c3163;">)</span> , refl <span style="color: #3a81c3;">&#10217;</span>
+
+odd<span style="color: #6c3163; font-weight: bold;">-</span><span style="color: #ba2f59; font-weight: bold;">&#931;</span> <span style="color: #3a81c3;">(</span>odd<span style="color: #715ab1;">-</span>succ even<span style="color: #715ab1;">-</span>n<span style="color: #3a81c3;">)</span> with <span style="color: #3a81c3;">(</span>even<span style="color: #715ab1;">-</span><span style="color: #ba2f59; font-weight: bold;">&#931;</span> even<span style="color: #715ab1;">-</span>n<span style="color: #3a81c3;">)</span>
+<span style="color: #715ab1;">...</span>                        <span style="color: #715ab1;">|</span> <span style="color: #3a81c3;">&#10216;</span> m , refl <span style="color: #3a81c3;">&#10217;</span> <span style="color: #715ab1;">=</span> <span style="color: #3a81c3;">&#10216;</span> m , refl <span style="color: #3a81c3;">&#10217;</span>
+</pre>
+</div>
+<p>
+para o caso base, sabemos que 0 é par, e a prova se resume a mostrar que 0 * 2 = 0 ao compilador. no caso recursivo, sabemos que ele deve ser da forma <code>even-succ odd-n</code> (onde <code>odd-n</code> é um elemento do tipo <code>odd n</code>), e podemos usar o fato de que a função <code>odd-Σ</code> nos dá um número <code>m</code>, que satisfaz \(1 + 2m = n\) (por indução). dado isso, é fácil ver que \(2 * (m + 1) = n + 1\). 
+</p>
+
+<p>
+para o caso recursivo ímpar, a prova é similar: construimos o elemento que satisfaz \(2 * m = n\), e sabemos que portanto (como n + 1 é ímpar), o mesmo <code>m</code> deve satisfazer \(1 + 2*m = n + 1\).
+</p>
+
+<p>
+o que é surpreendente (e não óbvio de primeira) é que na verdade o programa que acabamos de escrever é um algoritmo de divisão por 2. isto é, para qualquer natural, podemos obter uma prova de que <code>n</code> é <code>even</code> ou <code>odd</code>, e calcular metade do número (metade menos um caso seja ímpar).
+</p>
+
+<p>
+isto é:
+</p>
+<div class="org-src-container">
+<pre class="src src-haskell">fst <span style="color: #6c3163; font-weight: bold;">:</span> <span style="color: #3a81c3;">{</span><span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">Set</span><span style="color: #3a81c3;">}</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #3a81c3;">{</span><span style="color: #ba2f59; font-weight: bold;">B</span> <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">Set</span><span style="color: #3a81c3;">}</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #3a81c3;">(</span>pair <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#931;</span> <span style="color: #ba2f59; font-weight: bold;">A</span> <span style="color: #ba2f59; font-weight: bold;">B</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">A</span>
+<span style="color: #6c3163; font-weight: bold;">fst</span> <span style="color: #3a81c3;">&#10216;</span> a , b <span style="color: #3a81c3;">&#10217;</span> <span style="color: #715ab1;">=</span> a
+
+half <span style="color: #6c3163; font-weight: bold;">:</span> <span style="color: #3a81c3;">(</span>n <span style="color: #ba2f59; font-weight: bold;">:</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span><span style="color: #3a81c3;">)</span> <span style="color: #715ab1;">&#8594;</span> <span style="color: #ba2f59; font-weight: bold;">&#8469;</span>
+<span style="color: #6c3163; font-weight: bold;">half</span> n with even<span style="color: #715ab1;">-</span>or<span style="color: #715ab1;">-</span>odd n
+<span style="color: #715ab1;">...</span>       <span style="color: #715ab1;">|</span> left e <span style="color: #715ab1;">=</span> fst <span style="color: #3a81c3;">(</span>even<span style="color: #715ab1;">-</span><span style="color: #ba2f59; font-weight: bold;">&#931;</span> e<span style="color: #3a81c3;">)</span>
+<span style="color: #715ab1;">...</span>       <span style="color: #715ab1;">|</span> right o <span style="color: #715ab1;">=</span> fst <span style="color: #3a81c3;">(</span>odd<span style="color: #715ab1;">-</span><span style="color: #ba2f59; font-weight: bold;">&#931;</span> o<span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+<p>
+a função <code>fst</code> simplesmente retorna o primeiro componente de um par dependente. para calcular metade do número, descobrimos se ele é ímpar ou par; se for par, utilizamos <code>even-Σ</code>, se for ímpar, utilizamos <code>odd-Σ</code>, e em ambos os casos recebemos a metade do número.
+</p>
+
+<p>
+para evidenciar a função de programa da prova, podemos por exemplo calcular <code>half 514</code>, que de maneira quase que mágica nos retorna <code>257</code> (visto que não escrevemos nada explicitamente sobre divisão).
+</p>
+
+<p>
+e de fato, apenas tocamos a superfície do que provas construtivas são capazes de expressar, mas é muito revelador que a ideia de escrever uma prova também é um programa executável. por exemplo, a prova do teorema fundamental da aritmética (que eu ainda pretendo escrever um dia) é exatamente um algoritmo de fatoração de naturais em números primos.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: Jul  3, 2022-001656817200</p>
+<p class="author">Author: @o-santi</p>
+<p class="date">Created: Aug  9, 2022-001660067134</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+(rule
+ (target default.ml)
+ (deps default.eml.html)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
+
+(rule
+ (target post_list.ml)
+ (deps post_list.eml.html)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
+
+(rule
+ (target post.ml)
+ (deps post.eml.html)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
+
+(rule
+ (target index.ml)
+ (deps index.eml.html)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
+
+(rule
+ (target section.ml)
+ (deps section.eml.html)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
+
+(rule
+ (target header.ml)
+ (deps header.eml.html)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
+ 
+(rule
+ (target footer.ml)
+ (deps footer.eml.html)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
+ 
+(rule
+ (target navbar.ml)
+ (deps navbar.eml.html)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
+
+
